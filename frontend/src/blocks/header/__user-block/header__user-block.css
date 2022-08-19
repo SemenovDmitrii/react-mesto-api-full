@@ -1,0 +1,10 @@
+.header__user-block {
+  display: flex;
+  padding-top: 10px;
+}
+
+@media screen and (max-width: 950px) {
+  .header__user-block {
+    margin-right: 30px;
+  }
+}

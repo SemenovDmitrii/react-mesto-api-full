@@ -1,0 +1,8 @@
+.element__box-info {
+  display: grid;
+  grid-template-columns: auto 22px;
+  grid-template-rows: repeat(2, 17px);
+  row-gap: 3px;
+  align-items: center;
+  margin: 25px 21px 31px;
+}

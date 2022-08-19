@@ -1,0 +1,17 @@
+.header__user-exit {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 22px;
+  color: #fff;
+  height: 22px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: 0.3s opacity ease-in;
+}
+
+.header__user-exit:hover {
+  opacity: 0.6;
+}

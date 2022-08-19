@@ -1,0 +1,22 @@
+.auth__signin {
+  font-family: "Inter", "Arial", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+  color: #ffffff;
+  text-decoration: none;
+  margin-top: 15px;
+  transition: opacity 0.3s linear;
+  cursor: pointer;
+}
+
+.auth__signin:hover {
+  opacity: 0.6;
+}
+
+@media screen and (max-width: 550px) {
+  .auth__signin {
+    margin-top: 20px;
+  }
+}

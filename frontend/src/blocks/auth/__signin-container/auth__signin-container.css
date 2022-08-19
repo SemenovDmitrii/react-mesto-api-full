@@ -1,0 +1,5 @@
+.auth__signin-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

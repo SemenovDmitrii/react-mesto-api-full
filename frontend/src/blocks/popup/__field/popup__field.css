@@ -1,0 +1,6 @@
+.popup__field {
+    padding: 0;
+    margin: 0;
+    border: none;
+    display: grid;
+  }

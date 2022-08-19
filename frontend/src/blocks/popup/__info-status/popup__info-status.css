@@ -1,0 +1,7 @@
+.popup__info-status {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 26px 0;
+}

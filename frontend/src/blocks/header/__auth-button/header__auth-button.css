@@ -1,0 +1,21 @@
+.header__auth-button {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 22px;
+  text-decoration: none;
+  color: #fff;
+}
+
+.header__auth-button:hover {
+  opacity: 0.6;
+  transition: 0.5s;
+}
+
+@media screen and (max-width: 950px) {
+  .header__auth-button {
+    font-size: 14px;
+    line-height: 17px;
+  }
+}
