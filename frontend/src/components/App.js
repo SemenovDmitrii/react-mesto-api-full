@@ -244,39 +244,34 @@ function App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
-        <Header
-          loggedIn={loggedIn}
-          onSignOut={onSignOut}
-          userEmail={userEmail}
-        />
         <Switch>
-          <ProtectedRoute
-            exact path="/"
-            loggedIn={loggedIn}
-            component={Main}
-            cards={cards}
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
-          />
-
-          <Route path="/signup">
+          <Route path="/sign-up">
+            <Header authLink="sign-in" loggedIn={false} />
             <Register onRegister={onRegister} />
           </Route>
-
-          <Route path="/signin">
+          <Route path="/sign-in">
+            <Header authLink="sign-up" loggedIn={false} />
             <Login onAuthorize={onAuthorize} />
           </Route>
 
-          <Route exact path="*">
-            {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
-          </Route>
+          <ProtectedRoute exact path="/" loggedIn={loggedIn}>
+            <Header
+              loggedIn={loggedIn}
+              onSignOut={onSignOut}
+              userEmail={userEmail}
+            />
+            <Main
+              cards={cards}
+              onEditProfile={handleEditProfileClick}
+              onAddPlace={handleAddPlaceClick}
+              onEditAvatar={handleEditAvatarClick}
+              onCardClick={handleCardClick}
+              onCardLike={handleCardLike}
+              onCardDelete={handleCardDelete}
+            />
+            <Footer loggedIn={loggedIn} />
+          </ProtectedRoute>
         </Switch>
-
-        <Footer loggedIn={loggedIn} />
 
         <InfoTooltip
           isOpen={isInfoTooltipPopupOpen}

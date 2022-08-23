@@ -1,21 +1,23 @@
 import React from "react";
 
-function Login(props) {
-  const [ email, setEmail ] = React.useState('');
-  const [ password, setPassword ] = React.useState('');
+function Login({handleLogin}) {
+  const [formParams, setFormParams] = React.useState({
+    email: '',
+    password: '',
+  })
 
-  function handleChangeEmail(evt) {
-      setEmail(evt.target.value);
-  }
+  function handleSubmit(e) {
+    e.preventDefault()
+    handleLogin(formParams)
+  } 
 
-  function handleChangePassword(evt) {
-      setPassword(evt.target.value);
-  }
-
-  function handleSubmit(evt) {
-      evt.preventDefault();
-      props.onLogin({ email, password });
-  }
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setFormParams((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   return (
     <section className="auth">
@@ -32,8 +34,8 @@ function Login(props) {
             placeholder="Email"
             className="auth__input auth__content-email"
             required
-            onChange={handleChangeEmail}
-            value={email}
+            onChange={handleChange}
+            value={formParams.email}
           />
           <input
             type="password"
@@ -41,8 +43,8 @@ function Login(props) {
             placeholder="Пароль"
             className="auth__input auth__content-password"
             required
-            onChange={handleChangePassword}
-            value={password}
+            onChange={handleChange}
+            value={formParams.password}
           />
         </fieldset>
         <button type="submit" className="auth__form-submit">
