@@ -245,31 +245,34 @@ function App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
-        <Header
-          loggedIn={loggedIn}
-          onSignOut={onSignOut}
-          userEmail={userEmail}
-        />
-
         <Switch>
-          <ProtectedRoute
-            exact path="/"
-            loggedIn={loggedIn}
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
-            cards={cards}
-            component={Main}
-          />
+          <Route path="/">
+            <Header
+              loggedIn={loggedIn}
+              onSignOut={onSignOut}
+              userEmail={userEmail}
+            />
+            <ProtectedRoute
+              loggedIn={loggedIn}
+              onEditProfile={handleEditProfileClick}
+              onAddPlace={handleAddPlaceClick}
+              onEditAvatar={handleEditAvatarClick}
+              onCardClick={handleCardClick}
+              onCardLike={handleCardLike}
+              onCardDelete={handleCardDelete}
+              cards={cards}
+              component={Main}
+            />
+            <Footer />
+          </Route>
 
           <Route path="/sign-in">
+            <Header authLink="sign-up" loggedIn={false} />
             <Login onAuthorize={onAuthorize} />
           </Route>
 
           <Route path="/sign-up">
+            <Header authLink="sign-in" loggedIn={false} />
             <Register onRegister={onRegister} />
           </Route>
 
@@ -277,8 +280,6 @@ function App() {
             {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
           </Route>
         </Switch>
-
-        <Footer />
 
         <InfoTooltip
           isOpen={isInfoTooltipPopupOpen}
