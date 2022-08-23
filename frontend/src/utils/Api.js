@@ -1,5 +1,3 @@
-import config from '../config.json';
-
 class Api {
   constructor({ baseUrl, headers }) {
     this._baseUrl = baseUrl;
@@ -89,7 +87,7 @@ class Api {
   }
 }
 export const api = new Api({
-  baseUrl: config.API_SERVER_URL,
+  baseUrl: 'https://api.sdv.nomoredomains.sbs', 
   headers: {
     "Content-Type": "application/json",
   },

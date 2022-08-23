@@ -1,6 +1,4 @@
-import config from '../config.json';
-
-export const BASE_URL = config.API_SERVER_URL;
+export const BASE_URL = 'https://api.sdv.nomoredomains.sbs';
 
 export const register = (password, email) => {
   return fetch(`${BASE_URL}/signup`, {
