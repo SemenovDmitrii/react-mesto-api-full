@@ -51,9 +51,9 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signin', routerUsers);
-app.post('/signup', routerUsers);
-app.get('/signout', (req, res) => {
+app.post('/sign-in', routerUsers);
+app.post('/sign-up', routerUsers);
+app.get('/sign-out', (req, res) => {
   res.clearCookie('jwt').send({ message: 'Выход.' });
 });
 

@@ -188,7 +188,7 @@ function App() {
         setUserEmail(email);
         setRegisterStatus(true);
         setIsInfoTooltipPopupOpen(true);
-        history.push("/signin");
+        history.push("/sign-in");
       })
       .catch((err) => {
         setRegisterStatus(false);
@@ -251,9 +251,22 @@ function App() {
           userEmail={userEmail}
         />
         <Switch>
+          <ProtectedRoute
+            path="/"
+            loggedIn={loggedIn}
+            component={Main}
+            cards={cards}
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            onEditAvatar={handleEditAvatarClick}
+            onCardClick={handleCardClick}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}
+          />
           <Route path="/sign-up">
             <Register onRegister={onRegister} />
           </Route>
+
           <Route path="/sign-in">
             <Login onAuthorize={onAuthorize} />
           </Route>
@@ -261,19 +274,6 @@ function App() {
           <Route exact path="*">
             {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
           </Route>
-
-          <ProtectedRoute
-            exact path="/"
-            loggedIn={loggedIn}
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
-            cards={cards}
-            component={Main}
-          />
         </Switch>
 
         <Footer loggedIn={loggedIn} />
