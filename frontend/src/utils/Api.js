@@ -7,8 +7,9 @@ class Api {
   _serverResponse(res) {
     if (res.ok) {
       return res.json();
+    } else {
+      return Promise.reject(`Ошибка ${res.status}`);
     }
-    return Promise.reject("Произошла ошибка");
   }
 
   getUserInfo() {
@@ -60,7 +61,7 @@ class Api {
   }
 
   putLike(cardId) {
-    return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "PUT",
       credentials: 'include',
       headers: this._headers,
@@ -68,7 +69,7 @@ class Api {
   }
 
   deleteLike(cardId) {
-    return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "DELETE",
       credentials: 'include',
       headers: this._headers,

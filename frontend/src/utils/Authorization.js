@@ -1,56 +1,41 @@
-export const BASE_URL = 'https://api.sdv.nomoredomains.sbs';
+export const BASE_URL = "https://api.sdv.nomoredomains.sbs";
+
+function serverResponse(res) {
+  if (res.ok) {
+    return res.json();
+  } else {
+    return Promise.reject(`Ошибка ${res.status}`);
+  }
+}
 
 export const register = (password, email) => {
   return fetch(`${BASE_URL}/signup`, {
     method: "POST",
-    credentials: 'include',
     headers: {
-      'Accept': 'application/json',
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ password, email }),
-  }).then((res) => {
-    if (res.status === 201) {
-      return res.json();
-    } else {
-      return Promise.reject(`Ошибка: ${res.status}`);
-    }
-  });
+    credentials: "include",
+  }).then(serverResponse);
 };
 
 export const authorize = (password, email) => {
   return fetch(`${BASE_URL}/signin`, {
     method: "POST",
-    credentials: 'include',
     headers: {
-      'Accept': 'application/json',
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ password, email }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        return data;
-      } else {
-        return Promise.reject(`Ошибка: ${data.status}`);
-      }
-    });
+    credentials: "include",
+  }).then(serverResponse);
 };
 
-export const validateToken = (token) => {
+export const checkToken = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
     method: "GET",
-    credentials: 'include',
+    credentials: "include",
     headers: {
-      'Accept': 'application/json',
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
     },
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      return data;
-    });
+  }).then(serverResponse);
 };
