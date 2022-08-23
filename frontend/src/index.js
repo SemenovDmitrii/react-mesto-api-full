@@ -5,13 +5,13 @@ import "./index.css";
 import App from "./components/App";
 import reportWebVitals from "./reportWebVitals";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
+ReactDOM.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
+      <BrowserRouter>
+          <App />
+      </BrowserRouter>
+  </React.StrictMode>,
+  document.getElementById('root')
 );
 
 reportWebVitals();
