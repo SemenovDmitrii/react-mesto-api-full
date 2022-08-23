@@ -21,7 +21,6 @@ function App() {
   const [registerStatus, setRegisterStatus] = React.useState(false);
   const [loggedIn, setLogged] = React.useState(false);
   const [userEmail, setUserEmail] = React.useState("");
-  // const [authLink, setAuthLink] = React.useState("sign-up");
   const [isInfoTooltipPopupOpen, setIsInfoTooltipPopupOpen] =
     React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
@@ -251,15 +250,8 @@ function App() {
           userEmail={userEmail}
         />
         <Switch>
-          <Route path="/signup">
-            <Register onRegister={onRegister} />
-          </Route>
-
-          <Route path="/signin">
-            <Login onAuthorize={onAuthorize} />
-          </Route>
           <ProtectedRoute
-            path="/"
+            exact path="/"
             loggedIn={loggedIn}
             component={Main}
             cards={cards}
@@ -270,6 +262,18 @@ function App() {
             onCardLike={handleCardLike}
             onCardDelete={handleCardDelete}
           />
+
+          <Route path="/signup">
+            <Register onRegister={onRegister} />
+          </Route>
+
+          <Route path="/signin">
+            <Login onAuthorize={onAuthorize} />
+          </Route>
+
+          <Route exact path="*">
+            {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
+          </Route>
         </Switch>
 
         <Footer loggedIn={loggedIn} />

@@ -8,7 +8,7 @@ function serverResponse(res) {
   }
 }
 
-export const register = (password, email) => {
+export const register = ({ password, email }) => {
   return fetch(`${BASE_URL}/signup`, {
     method: "POST",
     credentials: "include",
@@ -19,7 +19,7 @@ export const register = (password, email) => {
   }).then(serverResponse);
 };
 
-export const authorize = (password, email) => {
+export const authorize = ({ password, email }) => {
   return fetch(`${BASE_URL}/signin`, {
     method: "POST",
     credentials: "include",
