@@ -188,7 +188,7 @@ function App() {
         setUserEmail(email);
         setRegisterStatus(true);
         setIsInfoTooltipPopupOpen(true);
-        history.push("/sign-in");
+        history.push("/signin");
       })
       .catch((err) => {
         setRegisterStatus(false);
@@ -219,7 +219,7 @@ function App() {
   function onSignOut() {
     localStorage.removeItem("jwt");
     setLogged(false);
-    history.push("/sign-in");
+    history.push("/signin");
   }
 
   React.useEffect(() => {
@@ -263,16 +263,16 @@ function App() {
             onCardLike={handleCardLike}
             onCardDelete={handleCardDelete}
           />
-          <Route path="/sign-up">
+          <Route path="/signup">
             <Register onRegister={onRegister} />
           </Route>
 
-          <Route path="/sign-in">
+          <Route path="/signin">
             <Login onAuthorize={onAuthorize} />
           </Route>
 
           <Route exact path="*">
-            {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+            {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
           </Route>
         </Switch>
 

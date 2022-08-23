@@ -65,7 +65,7 @@ routerUsers.patch(
 );
 
 routerUsers.post(
-  '/sign-in',
+  '/signin',
   celebrate({
     body: Joi.object().keys({
       email: Joi.string().email().required(),

@@ -42,7 +42,7 @@ function Register(props) {
       </form>
       <div className="auth__signin-container">
         <p className="auth__text">Уже зарегистрированы?</p>
-        <Link to="/sign-in" className="auth__signin">
+        <Link to="/signin" className="auth__signin">
           Войти
         </Link>
       </div>
