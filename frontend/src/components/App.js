@@ -236,11 +236,9 @@ function App() {
         <Header loggedIn={loggedIn} onLogout={onLogout} email={email} />
         <Switch>
           <Route path="/sign-up">
-            <Header authLink="sign-in" loggedIn={false} />
             <Register onRegister={onRegister} />
           </Route>
           <Route path="/sign-in">
-            <Header authLink="sign-up" loggedIn={false} />
             <Login onAuthorize={onAuthorize} />
           </Route>
           <ProtectedRoute
