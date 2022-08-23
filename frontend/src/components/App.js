@@ -259,7 +259,7 @@ function App() {
             <Login onAuthorize={onAuthorize} />
           </Route>
           <ProtectedRoute
-            exact path="/"
+            path="/"
             loggedIn={loggedIn}
             component={Main}
             cards={cards}
