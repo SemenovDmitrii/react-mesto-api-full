@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch, useHistory } from "react-router-dom";
+import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import * as auth from "../utils/Authorization.js";
 import Header from "./Header";
 import Main from "./Main";
@@ -20,6 +20,7 @@ function App() {
   const history = useHistory();
   const [registerStatus, setRegisterStatus] = React.useState(false);
   const [loggedIn, setLogged] = React.useState(false);
+  const [userEmail, setUserEmail] = React.useState("");
   // const [authLink, setAuthLink] = React.useState("sign-up");
   const [isInfoTooltipPopupOpen, setIsInfoTooltipPopupOpen] =
     React.useState(false);
@@ -31,14 +32,34 @@ function App() {
   const [selectedCard, setSelectedCard] = React.useState({ isOpen: false });
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
-  const [email, setEmail] = React.useState("");
-
   const isOpen =
     isInfoTooltipPopupOpen ||
     isEditAvatarPopupOpen ||
     isEditProfilePopupOpen ||
     isAddPlacePopupOpen ||
     selectedCard.isOpen;
+
+  React.useEffect(() => {
+    if (!loggedIn) return;
+    api
+      .getUserInfo()
+      .then(setCurrentUser)
+      .catch((err) => {
+        console.log(`Ошибка : ${err}`);
+      });
+  }, [loggedIn]);
+
+  React.useEffect(() => {
+    if (!loggedIn) return;
+    api
+      .getInitialCards()
+      .then((res) => {
+        setCards(res?.reverse());
+      })
+      .catch((err) => {
+        console.log(`Ошибка : ${err}`);
+      });
+  }, [loggedIn]);
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
@@ -117,18 +138,6 @@ function App() {
     }
   }, [isOpen]);
 
-  function getInitialData() {
-    Promise.all([api.getInitialCards(), api.getUserInfo()])
-      .then((result) => {
-        const [cards, user] = result;
-        setCurrentUser(user);
-        setCards(cards);
-      })
-      .catch((err) => {
-        console.log(`Ошибка : ${err}`);
-      });
-  }
-
   function handleUpdateUser(userInfo) {
     api
       .patchUserInfo(userInfo)
@@ -172,46 +181,14 @@ function App() {
       });
   }
 
-  function onRegister(data) {
+  function onRegister(email, password) {
     auth
-      .register(data)
-      .then((res) => {
-        if (res.email) {
-          setRegisterStatus(true);
-          history.push("/sign-in");
-        } else {
-          setRegisterStatus(false);
-        }
+      .register(email, password)
+      .then(() => {
+        setUserEmail(email);
+        setRegisterStatus(true);
         setIsInfoTooltipPopupOpen(true);
-      })
-      .catch((err) => {
-        console.log(`Ошибка : ${err}`);
-      });
-  }
-  function checkToken() {
-    if (localStorage.getItem("jwt")) {
-      const jwt = localStorage.getItem("jwt");
-      auth
-        .checkToken(jwt)
-        .then((res) => {
-          setEmail(res.email);
-          setLogged(true);
-          getInitialData();
-          history.push("/");
-        })
-        .catch((err) => {
-          setLogged(false);
-          setIsInfoTooltipPopupOpen(true);
-          console.log(`Ошибка : ${err}`);
-        });
-    }
-  }
-  function onAuthorize(data) {
-    auth
-      .authorize(data)
-      .then((data) => {
-        localStorage.setItem("jwt", data.token);
-        checkToken();
+        history.push("/signin");
       })
       .catch((err) => {
         setRegisterStatus(false);
@@ -220,28 +197,63 @@ function App() {
       });
   }
 
-  function onLogout() {
+  function onAuthorize(email, password) {
+    auth
+      .authorize(email, password)
+      .then((res) => {
+        if (res) {
+          localStorage.setItem("jwt", res.token);
+          api.setToken(res.token);
+          setUserEmail(email);
+          setLogged(true);
+          history.push("/");
+        }
+      })
+      .catch((err) => {
+        setRegisterStatus(false);
+        setIsInfoTooltipPopupOpen(true);
+        console.log(`Ошибка : ${err}`);
+      });
+  }
+
+  function onSignOut() {
     localStorage.removeItem("jwt");
     setLogged(false);
     history.push("/sign-in");
   }
 
   React.useEffect(() => {
-    checkToken();
-  }, [history, loggedIn]);
+    const onCheckToken = () => {
+      const jwt = localStorage.getItem("jwt");
+      if (!jwt) {
+        return;
+      }
+      auth
+        .checkToken(jwt)
+        .then((res) => {
+          setUserEmail(res.email);
+          setLogged(true);
+          history.push("/");
+        })
+        .catch((err) => {
+          console.log(`Ошибка : ${err}`);
+        });
+    };
+    onCheckToken();
+  }, [history]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
-        <Header loggedIn={loggedIn} onLogout={onLogout} email={email} />
+        <Header
+          loggedIn={loggedIn}
+          onSignOut={onSignOut}
+          userEmail={userEmail}
+        />
+
         <Switch>
-          <Route path="/sign-up">
-            <Register onRegister={onRegister} />
-          </Route>
-          <Route path="/sign-in">
-            <Login onAuthorize={onAuthorize} />
-          </Route>
           <ProtectedRoute
+            exact
             path="/"
             loggedIn={loggedIn}
             onEditProfile={handleEditProfileClick}
@@ -253,8 +265,23 @@ function App() {
             cards={cards}
             component={Main}
           />
+
+          <Route path="/sign-in">
+            <Header authLink="sign-up" loggedIn={false} />
+            <Login onAuthorize={onAuthorize} />
+          </Route>
+
+          <Route path="/sign-up">
+            <Header authLink="sign-in" loggedIn={false} />
+            <Register onRegister={onRegister} />
+          </Route>
+
+          <Route exact path="*">
+            {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+          </Route>
         </Switch>
-        <Footer loggedIn={loggedIn} />
+
+        <Footer />
 
         <InfoTooltip
           isOpen={isInfoTooltipPopupOpen}

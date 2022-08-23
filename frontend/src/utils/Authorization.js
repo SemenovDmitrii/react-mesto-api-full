@@ -4,38 +4,41 @@ function serverResponse(res) {
   if (res.ok) {
     return res.json();
   } else {
-    return Promise.reject(`Ошибка ${res.status}`);
+    return Promise.reject(`Ошибка ${res.status}: ${res.statusText}`);
   }
 }
 
-export const register = ({ password, email }) => {
+export const register = (password, email) => {
   return fetch(`${BASE_URL}/signup`, {
     method: "POST",
+    credentials: "include",
     headers: {
-      "Content-Type": "application/json"
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({ password, email }),
-    credentials: "include",
   }).then(serverResponse);
 };
 
-export const authorize = ({ password, email }) => {
+export const authorize = (password, email) => {
   return fetch(`${BASE_URL}/signin`, {
     method: "POST",
+    credentials: "include",
     headers: {
-      "Content-Type": "application/json"
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({ password, email }),
-    credentials: "include",
   }).then(serverResponse);
 };
 
 export const checkToken = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
     method: "GET",
-    credentials: "include",
+    credentials: 'include',
     headers: {
-      "Content-Type": "application/json",
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
   }).then(serverResponse);
 };

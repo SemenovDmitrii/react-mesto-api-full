@@ -7,15 +7,17 @@ class Api {
   _serverResponse(res) {
     if (res.ok) {
       return res.json();
-    } else {
-      return Promise.reject(`Ошибка ${res.status}`);
     }
+      return Promise.reject(`Ошибка ${res.status}`);
+  }
+
+  setToken(token) {
+    this._headers.Authorization = `Bearer ${token}`
   }
 
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "GET",
-      credentials: 'include',
       headers: this._headers,
     }).then(this._serverResponse);
   }
@@ -23,7 +25,6 @@ class Api {
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
       method: "GET",
-      credentials: 'include',
       headers: this._headers,
     }).then(this._serverResponse);
   }
@@ -31,7 +32,6 @@ class Api {
   patchUserInfo(data) {
     return fetch(`${this._baseUrl}/users/me/`, {
       method: "PATCH",
-      credentials: 'include',
       headers: this._headers,
       body: JSON.stringify({
         name: data.name,
@@ -43,7 +43,6 @@ class Api {
   postCard(data) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
-      credentials: 'include',
       headers: this._headers,
       body: JSON.stringify({
         name: data.name,
@@ -55,7 +54,6 @@ class Api {
   deleteCard(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: "DELETE",
-      credentials: 'include',
       headers: this._headers,
     }).then(this._serverResponse);
   }
@@ -63,7 +61,6 @@ class Api {
   putLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "PUT",
-      credentials: 'include',
       headers: this._headers,
     }).then(this._serverResponse);
   }
@@ -71,7 +68,6 @@ class Api {
   deleteLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "DELETE",
-      credentials: 'include',
       headers: this._headers,
     }).then(this._serverResponse);
   }
@@ -79,7 +75,6 @@ class Api {
   patchAvatar(data) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
-      credentials: 'include',
       headers: this._headers,
       body: JSON.stringify({
         avatar: data.avatar,
@@ -91,5 +86,6 @@ export const api = new Api({
   baseUrl: 'https://api.sdv.nomoredomains.sbs', 
   headers: {
     "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem('jwt')}`,
   },
 });
