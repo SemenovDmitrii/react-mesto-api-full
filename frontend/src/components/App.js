@@ -253,8 +253,7 @@ function App() {
 
         <Switch>
           <ProtectedRoute
-            exact
-            path="/"
+            exact path="/"
             loggedIn={loggedIn}
             onEditProfile={handleEditProfileClick}
             onAddPlace={handleAddPlaceClick}
@@ -267,12 +266,10 @@ function App() {
           />
 
           <Route path="/sign-in">
-            <Header authLink="sign-up" loggedIn={false} />
             <Login onAuthorize={onAuthorize} />
           </Route>
 
           <Route path="/sign-up">
-            <Header authLink="sign-in" loggedIn={false} />
             <Register onRegister={onRegister} />
           </Route>
 
