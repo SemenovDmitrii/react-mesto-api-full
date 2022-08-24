@@ -1,25 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function Register({handleRegister}) {
-
-  const [formParams, setFormParams] = React.useState({
-    email: '',
-    password: '',
-  })
+function Register(props) {
+  const email = React.useRef();
+  const password = React.useRef();
 
   function handleSubmit(e) {
-    e.preventDefault()
-    handleRegister(formParams)
-  } 
-
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setFormParams((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+    e.preventDefault();
+    props.onRegister(password.current.value, email.current.value);
+  }
 
   return (
     <section className="auth">
@@ -36,8 +25,7 @@ function Register({handleRegister}) {
             placeholder="Email"
             className="auth__input auth__content-email"
             required
-            onChange={handleChange}
-            value={formParams.email}
+            ref={email}
           />
           <input
             type="password"
@@ -45,8 +33,7 @@ function Register({handleRegister}) {
             placeholder="Пароль"
             className="auth__input auth__content-password"
             required
-            onChange={handleChange}
-            value={formParams.password}
+            ref={password}
           />
         </fieldset>
         <button type="submit" className="auth__form-submit">
@@ -55,7 +42,7 @@ function Register({handleRegister}) {
       </form>
       <div className="auth__signin-container">
         <p className="auth__text">Уже зарегистрированы?</p>
-        <Link to="/signin" className="auth__signin">
+        <Link to="/sign-in" className="auth__signin">
           Войти
         </Link>
       </div>

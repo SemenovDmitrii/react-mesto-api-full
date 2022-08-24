@@ -3,6 +3,8 @@ const { celebrate, Joi } = require('celebrate');
 
 const {
   login,
+  logout,
+  cookiesCheck,
   getUser,
   getUsers,
   createUser,
@@ -10,6 +12,8 @@ const {
   updateUser,
   updateAvatar,
 } = require('../controllers/users');
+
+routerUsers.get('/check', cookiesCheck);
 
 routerUsers.get('/users', getUsers);
 
@@ -24,6 +28,19 @@ routerUsers.get(
   }),
   getUser,
 );
+
+routerUsers.post(
+  '/signin',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
+    }),
+  }),
+  login,
+);
+
+routerUsers.post('/logout', logout);
 
 routerUsers.post(
   '/sign-up',
@@ -62,17 +79,6 @@ routerUsers.patch(
     }),
   }),
   updateAvatar,
-);
-
-routerUsers.post(
-  '/signin',
-  celebrate({
-    body: Joi.object().keys({
-      email: Joi.string().email().required(),
-      password: Joi.string().required(),
-    }),
-  }),
-  login,
 );
 
 module.exports = routerUsers;

@@ -6,8 +6,8 @@ import headerLogo from "../images/header-logo.svg";
 function Header(props) {
   const currentUser = React.useContext(CurrentUserContext);
   const authLinkText = {
-    "sign-in": "Войти",
-    "sign-up": "Регистрация",
+    "signin": "Войти",
+    "signup": "Регистрация",
   };
   return (
     <header className="header">
