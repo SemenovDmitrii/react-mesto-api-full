@@ -179,7 +179,7 @@ function App() {
     auth
       .authorize(password, email)
       .then((token) => {
-        auth.getCheckToken(token)
+        auth.checkToken(token)
         .then((res) => {
           setLogged(true);
           setUserEmail(res.email);
