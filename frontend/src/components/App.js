@@ -1,6 +1,6 @@
 import React from "react";
 import { Route, Switch, Redirect, useHistory } from "react-router-dom";
-import * as auth from "../utils/Authorization.js";
+import * as auth from "../utils/auth.js";
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
@@ -164,7 +164,7 @@ function App() {
         if (res.statusCode !== 201) {
           setEmail(res.email);
           setRegisterStatus(true);
-          history.push("/signin");
+          history.push("/sign-in");
           setIsInfoTooltipPopupOpen(true);
         }
       })
@@ -198,22 +198,6 @@ function App() {
     setLogged(false)
   }
 
-  React.useEffect(() => {
-    if (loggedIn) {
-      Promise.all([api.getUserInfo(), api.getInitialCards()])
-        .then(([user, cards]) => {
-          setCurrentUser(user)
-          setCards(cards.reverse())
-        })
-        .catch((err) => console.log(err));
-      tokenCheck()
-    }
-  }, [loggedIn]);
-
-  React.useEffect(() => {
-    tokenCheck()
-  }, []);
-
   function tokenCheck() {
     const jwt = localStorage.getItem('jwt')
     if (jwt) {
@@ -228,6 +212,22 @@ function App() {
         .catch((err) => console.log(err))
     }
   };
+
+  React.useEffect(() => {
+    tokenCheck()
+  }, []);
+
+  React.useEffect(() => {
+    if (loggedIn) {
+      Promise.all([api.getUserInfo(), api.getInitialCards()])
+        .then(([user, cards]) => {
+          setCurrentUser(user)
+          setCards(cards.reverse())
+        })
+        .catch((err) => console.log(err));
+      tokenCheck()
+    }
+  }, [loggedIn]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -246,21 +246,21 @@ function App() {
               cards={cards}
             />
 
-            <Footer />
+            <Footer loggedIn={loggedIn}/>
           </ProtectedRoute>
 
-          <Route path="/signin">
-            <Header authLink="signup" loggedIn={false} />
+          <Route path="/sign-in">
+            <Header authLink="sign-up" loggedIn={false} />
             <Login onAuthorize={onAuthorize} />
           </Route>
 
-          <Route path="/signup">
-            <Header authLink="signin" loggedIn={false} />
+          <Route path="/sign-up">
+            <Header authLink="sign-in" loggedIn={false} />
             <Register onRegister={onRegister} />
           </Route>
 
           <Route exact path="/">
-            {loggedIn ? <Redirect to="*" /> : <Redirect to="/signin" />}
+            {loggedIn ? <Redirect to="*" /> : <Redirect to="/sign-in" />}
           </Route>
         </Switch>
 

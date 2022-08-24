@@ -42,9 +42,7 @@ routerUsers.post(
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
-      avatar: Joi.string().pattern(
-        /^http[s]*:\/\/[a-z0-9.\-_~:/?#[\]@!$&'()*+,;=]+|www\.[a-z0-9.-_~:?#[\]@!$&'()*+,;=]+/,
-      ),
+      avatar: Joi.string().uri({ scheme: ['http', 'https'] }),
       email: Joi.string().email().required(),
       password: Joi.string().required(),
     }),
@@ -65,13 +63,11 @@ routerUsers.patch(
 
 routerUsers.patch(
   '/me/avatar',
-  celebrate({
-    body: Joi.object().keys({
-      avatar: Joi.string().pattern(
-        /^http[s]*:\/\/[a-z0-9.\-_~:/?#[\]@!$&'()*+,;=]+|www\.[a-z0-9.-_~:?#[\]@!$&'()*+,;=]+/,
-      ),
-    }),
-  }),
+  celebrate(
+    {
+      body: Joi.object().keys({ avatar: Joi.string().required().uri({ scheme: ['http', 'https'] }) }),
+    },
+  ),
   updateAvatar,
 );
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 
-function Login({ onAuth }) {
+function Login({ onAuthorize }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -11,7 +11,7 @@ function Login({ onAuth }) {
 
   function handleSubmit(e) {
     e.preventDefault()
-    onAuth(password, email);
+    onAuthorize(password, email);
   }
 
   return (
