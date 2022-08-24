@@ -20,19 +20,32 @@ const {
 
 const app = express();
 
-app.use(cors({
-  origin: [
-    'http://sdv.nomoredomains.sbs',
-    'https://sdv.nomoredomains.sbs',
-    'http://api.sdv.nomoredomains.sbs',
-    'https://api.sdv.nomoredomains.sbs',
-    'http://localhost:3000',
-    'https://localhost:3000',
-    'http://localhost:3001',
-    'https://localhost:3001',
-  ],
-  credentials: true,
-}));
+app.use(cors);
+
+const allowedCors = [
+  'http://sdv.nomoredomains.sbs',
+  'https://sdv.nomoredomains.sbs',
+  'http://api.sdv.nomoredomains.sbs',
+  'https://api.sdv.nomoredomains.sbs',
+  'http://localhost:3000',
+  'https://localhost:3000',
+];
+
+app.use((req, res, next) => {
+  const { origin } = req.headers;
+  const { method } = req;
+  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+  const requestHeaders = req.headers['access-control-request-headers'];
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  if (method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
+    res.header('Access-Control-Allow-Headers', requestHeaders);
+    return res.end();
+  }
+  next();
+});
 
 mongoose.connect((NODE_ENV === 'production' ? MONGODB : 'mongodb://localhost:27017/mestodb'), {
   useUnifiedTopology: true,
