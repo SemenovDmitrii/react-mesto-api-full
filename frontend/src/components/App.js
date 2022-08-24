@@ -20,7 +20,7 @@ function App() {
   const history = useHistory();
   const [registerStatus, setRegisterStatus] = React.useState(false);
   const [loggedIn, setLogged] = React.useState(false);
-  const [userEmail, setUserEmail] = React.useState("");
+  const [email, setEmail] = React.useState('')
   const [isInfoTooltipPopupOpen, setIsInfoTooltipPopupOpen] =
     React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
@@ -162,7 +162,7 @@ function App() {
     auth.register(password, email)
       .then((res) => {
         if (res.statusCode !== 201) {
-          setUserEmail(res.email);
+          setEmail(res.email);
           setRegisterStatus(true);
           history.push("/signin");
           setIsInfoTooltipPopupOpen(true);
@@ -182,7 +182,7 @@ function App() {
         auth.checkToken(token)
         .then((res) => {
           setLogged(true);
-          setUserEmail(res.email);
+          setEmail(res.email);
           history.push("/");
         })
       })
@@ -221,7 +221,7 @@ function App() {
         .then((res) => {
           if (res) {
             setLogged(true)
-            setUserEmail(res.email)
+            setEmail(res.email)
             history.push('/')
           }
         })
@@ -234,7 +234,7 @@ function App() {
       <div className="App">
         <Switch>
           <ProtectedRoute exact path="/" loggedIn={loggedIn}>
-            <Header loggedIn={loggedIn} onSignOut={onSignOut} email={userEmail} />
+            <Header loggedIn={loggedIn} onSignOut={onSignOut} email={email} />
 
             <Main
               onEditProfile={handleEditProfileClick}

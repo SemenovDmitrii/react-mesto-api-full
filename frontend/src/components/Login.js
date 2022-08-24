@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useState } from "react"
 
-function Login(props) {
-  const email = React.useRef();
-  const password = React.useRef();
+function Login({ onAuth }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  function handleChange(e) {
+    const { value } = e.target;
+    e.target.name === 'email' ? setEmail(value) : setPassword(value)
+  }
 
   function handleSubmit(e) {
-    e.preventDefault();
-    props.onAuthorize(password.current.value, email.current.value);
+    e.preventDefault()
+    onAuth(password, email);
   }
 
   return (
@@ -24,7 +29,8 @@ function Login(props) {
             placeholder="Email"
             className="auth__input auth__content-email"
             required
-            ref={email}
+            value={email || ''}
+            onChange={handleChange}
           />
           <input
             type="password"
@@ -32,7 +38,8 @@ function Login(props) {
             placeholder="Пароль"
             className="auth__input auth__content-password"
             required
-            ref={password}
+            value={password || ''}
+            onChange={handleChange}
           />
         </fieldset>
         <button type="submit" className="auth__form-submit">
