@@ -246,10 +246,10 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
         <Switch>
-          <Route path="/cards">
+          <ProtectedRoute exact path="/" loggedIn={loggedIn}>
             <Header loggedIn={loggedIn} onLogout={onLogout} email={userEmail} />
-            <ProtectedRoute
-              loggedIn={loggedIn}
+
+            <Main
               onEditProfile={handleEditProfileClick}
               onAddPlace={handleAddPlaceClick}
               onEditAvatar={handleEditAvatarClick}
@@ -257,10 +257,10 @@ function App() {
               onCardLike={handleCardLike}
               onCardDelete={handleCardDelete}
               cards={cards}
-              component={Main}
             />
+
             <Footer />
-          </Route>
+          </ProtectedRoute>
 
           <Route path="/signin">
             <Header authLink="signup" loggedIn={false} />
