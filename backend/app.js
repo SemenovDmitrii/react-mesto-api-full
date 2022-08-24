@@ -28,13 +28,9 @@ app.use(cors({
     'https://api.sdv.nomoredomains.sbs',
     'http://localhost:3000',
     'https://localhost:3000',
+    'http://localhost:3001',
+    'https://localhost:3001',
   ],
-  allowedHeaders: [
-    'Access-Control-Allow-Credentials',
-    'Access-Control-Allow-Origin',
-    'Content-Type'
-  ],
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   credentials: true,
 }));
 
