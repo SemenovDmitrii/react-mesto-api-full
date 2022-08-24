@@ -159,10 +159,10 @@ function App() {
   }
 
   function onRegister(password, email) {
-    auth
-      .register(password, email)
+    auth.register(password, email)
       .then((res) => {
-        if (res.email) {
+        if (res.statusCode !== 201) {
+          setUserEmail(res.email);
           setRegisterStatus(true);
           history.push("/signin");
           setIsInfoTooltipPopupOpen(true);
