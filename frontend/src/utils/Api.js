@@ -11,10 +11,6 @@ class Api {
       return Promise.reject(`Ошибка ${res.status}`);
   }
 
-  setToken(token) {
-    this._headers.Authorization = `Bearer ${token}`
-  }
-
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "GET",
@@ -94,6 +90,5 @@ export const api = new Api({
   baseUrl: 'https://api.sdv.nomoredomains.sbs', 
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem('jwt')}`,
   },
 });

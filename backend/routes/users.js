@@ -43,7 +43,7 @@ routerUsers.post(
 routerUsers.post('/logout', logout);
 
 routerUsers.post(
-  '/sign-up',
+  '/signup',
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),

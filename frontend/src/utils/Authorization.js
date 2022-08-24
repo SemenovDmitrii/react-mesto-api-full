@@ -13,32 +13,43 @@ export const register = ({ password, email }) => {
     method: "POST",
     credentials: "include",
     headers: {
+      'Accept': 'application/json',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ password, email }),
   }).then(serverResponse);
 };
 
-export const authorize = ({ password, email }) => {
+export const login = ({ email, password }) => {
   return fetch(`${BASE_URL}/signin`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ password, email }),
-  }).then(serverResponse);
-};
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password, email }),
+    }).then(serverResponse);
+  };
 
-export const checkToken = (token) => {
-  return fetch(`${BASE_URL}/users/me`, {
-    method: "GET",
-    credentials: 'include',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  }).then(serverResponse);
-};
+export const logout = () => {
+  return fetch(`${BASE_URL}/logout`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    }).then(serverResponse);
+  };
+
+export const cookiesCheck = () => {
+  return fetch(`${BASE_URL}/check`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    }).then(serverResponse);
+  };
