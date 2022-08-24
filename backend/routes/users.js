@@ -1,10 +1,8 @@
 const routerUsers = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const { login, createUser } = require('../controllers/users');
 
 const {
-  login,
-  logout,
-  cookiesCheck,
   getUser,
   getUsers,
   createUser,
@@ -13,14 +11,12 @@ const {
   updateAvatar,
 } = require('../controllers/users');
 
-routerUsers.get('/check', cookiesCheck);
+routerUsers.get('/', getUsers);
 
-routerUsers.get('/users', getUsers);
-
-routerUsers.get('/users/me', getCurrentUser);
+routerUsers.get('/me', getCurrentUser);
 
 routerUsers.get(
-  '/users/:userId',
+  '/:userId',
   celebrate({
     params: Joi.object().keys({
       userId: Joi.string().hex().length(24),
@@ -40,8 +36,6 @@ routerUsers.post(
   login,
 );
 
-routerUsers.post('/logout', logout);
-
 routerUsers.post(
   '/signup',
   celebrate({
@@ -59,7 +53,7 @@ routerUsers.post(
 );
 
 routerUsers.patch(
-  '/users/me',
+  '/me',
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
@@ -70,7 +64,7 @@ routerUsers.patch(
 );
 
 routerUsers.patch(
-  '/users/me/avatar',
+  '/me/avatar',
   celebrate({
     body: Joi.object().keys({
       avatar: Joi.string().pattern(

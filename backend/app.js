@@ -12,7 +12,12 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const NotFoundError = require('./errors/NotFoundError');
 
-const { PORT = 3000 } = process.env;
+const {
+  PORT = 3000,
+  NODE_ENV,
+  MONGODB,
+ } = process.env;
+
 const app = express();
 
 app.use(cors({
@@ -33,10 +38,10 @@ app.use(cors({
   credentials: true,
 }));
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
+mongoose.connect((NODE_ENV === 'production' ? MONGODB : 'mongodb://localhost:27017/mestodb'), {
+  useUnifiedTopology: true,
   useNewUrlParser: true,
   useCreateIndex: true,
-  useFindAndModify: false,
 });
 
 app.use(cookieParser());
@@ -53,7 +58,6 @@ app.get('/crash-test', () => {
 
 app.post('/signin', routerUsers);
 app.post('/signup', routerUsers);
-app.post('/logout', routerUsers);
 
 app.use(auth);
 app.use('/', auth, routerUsers);

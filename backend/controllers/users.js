@@ -49,10 +49,7 @@ module.exports.createUser = (req, res, next) => {
   const {
     email, name, about, avatar, password,
   } = req.body;
-  if (!email || !password) {
-    return next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
-  }
-  return bcrypt
+  bcrypt
   .hash(password, 10)
   .then((hash) => {
     User.create({
@@ -62,10 +59,13 @@ module.exports.createUser = (req, res, next) => {
       about,
       avatar,
     })
-      .then(({ _id }) => {
-        User.findById(_id).select()
-        .then((user) => res.status(201).send(user));
-      })
+    .then((user) => res.status(201).send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      _id: user._id,
+      email: user.email,
+    }))
       .catch((err) => {
         if (err.code === 11000) {
           next(new ConflictError('Вееденный email уже зарегестрирован'));
@@ -109,12 +109,7 @@ module.exports.updateUser = (req, res, next) => {
 module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
-  if (typeof avatar !== 'string') {
-    throw new BadRequestError(
-      'Переданы некорректные данные при обновлении аватара.',
-    );
-  }
-  return User.findByIdAndUpdate(
+  User.findByIdAndUpdate(
     req.user._id,
     { avatar },
     { new: true, runValidators: true },
@@ -147,14 +142,7 @@ module.exports.login = (req, res, next) => {
           expiresIn: '7d',
         },
       );
-      res
-        .cookie('jwt', token, {
-          maxAge: 3600000,
-          httpOnly: true,
-          sameSite: true,
-        })
-        .status(200)
-        .send({ message: 'Успешная авторизация.' });
+      resres.send({ token })
     })
     .catch(() => {
       next(new UnauthorizedError('Неверный пароль или почта'));
@@ -162,30 +150,3 @@ module.exports.login = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.logout = (req, res, next) => {
-  User.findById(req.user._id)
-    .then((user) => {
-      if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
-      }
-      return res
-        .clearCookie('jwt')
-        .status(200)
-        .send({ message: 'До встречи!' });
-    })
-    .catch(next);
-};
-
-module.exports.cookiesCheck = (req, res) => {
-  const cookie = req.cookies;
-  if (!cookie) {
-    throw new UnauthorizedError('Необходима авторизация');
-  }
-  const token = cookie.jwt;
-  try {
-    jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key');
-    res.send({ message: 'OK' });
-  } catch (err) {
-    res.send({ message: 'Unauthorized' });
-  }
-};

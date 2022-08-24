@@ -86,9 +86,15 @@ class Api {
     }).then(this._serverResponse);
   }
 }
+
+const getToken = () => {
+  return `Bearer ${localStorage.getItem('jwt')}`;
+}
+
 export const api = new Api({
   baseUrl: 'https://api.sdv.nomoredomains.sbs', 
   headers: {
-    "Content-Type": "application/json",
+    "Authorization": getToken(),
+    'Content-Type': 'application/json'
   },
 });
