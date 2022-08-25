@@ -186,9 +186,9 @@ function App() {
     }
   }, [loggedIn, history]);
 
-  function onRegister(password, email) {
+  function onRegister(email, password) {
     auth
-      .register(password, email)
+      .register(email, password)
       .then((res) => {
         setRegisterStatus(true);
         setIsInfoTooltipPopupOpen(true);
@@ -203,7 +203,7 @@ function App() {
 
   function onAuthorize(password, email) {
     auth
-      .authorize(password, email)
+      .authorize(email, password)
       .then((data) => {
         localStorage.setItem("jwt", data.token);
         setLogged(true);
