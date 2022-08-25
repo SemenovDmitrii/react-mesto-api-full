@@ -14,6 +14,7 @@ class Api {
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "GET",
+      credentials: 'include',
       headers: {
         "Authorization": getToken(),
         'Content-Type': 'application/json'
@@ -24,6 +25,7 @@ class Api {
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
       method: "GET",
+      credentials: 'include',
       headers: {
         "Authorization": getToken(),
         'Content-Type': 'application/json'
@@ -34,6 +36,7 @@ class Api {
   patchUserInfo(data) {
     return fetch(`${this._baseUrl}/users/me/`, {
       method: "PATCH",
+      credentials: 'include',
       headers: {
         "Authorization": getToken(),
         'Content-Type': 'application/json',
@@ -48,6 +51,7 @@ class Api {
   postCard(data) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
+      credentials: 'include',
       headers: {
         "Authorization": getToken(),
         'Content-Type': 'application/json'
@@ -62,6 +66,7 @@ class Api {
   deleteCard(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: "DELETE",
+      credentials: 'include',
       headers: {
         "Authorization": getToken(),
         'Content-Type': 'application/json'
@@ -72,6 +77,7 @@ class Api {
   putLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "PUT",
+      credentials: 'include',
       headers: {
         "Authorization": getToken(),
         'Content-Type': 'application/json'
@@ -82,6 +88,7 @@ class Api {
   deleteLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "DELETE",
+      credentials: 'include',
       headers: {
         "Authorization": getToken(),
         'Content-Type': 'application/json'
@@ -92,6 +99,7 @@ class Api {
   patchAvatar(data) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: 'PATCH',
+      credentials: 'include',
       headers: {
         "Authorization": getToken(),
         'Content-Type': 'application/json',
