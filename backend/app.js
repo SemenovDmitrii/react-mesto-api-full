@@ -17,18 +17,21 @@ const app = express();
 
 app.use(cors(allowedCors));
 
-const allowedCors = [
-  'http://sdv.nomoredomains.sbs',
-  'https://sdv.nomoredomains.sbs',
-  'http://api.sdv.nomoredomains.sbs',
-  'https://api.sdv.nomoredomains.sbs',
-  'https://www.api.sdv.nomoredomains.sbs',
-  'http://www.api.sdv.nomoredomains.sbs',
-  'http://localhost:3000',
-  'https://localhost:3000',
-  'http://localhost:3001',
-  'https://localhost:3001',
-];
+const allowedCors = {
+  origin: [
+    'http://sdv.nomoredomains.sbs',
+    'https://sdv.nomoredomains.sbs',
+    'http://api.sdv.nomoredomains.sbs',
+    'https://api.sdv.nomoredomains.sbs',
+    'https://www.api.sdv.nomoredomains.sbs',
+    'http://www.api.sdv.nomoredomains.sbs',
+    'http://localhost:3000',
+    'https://localhost:3000',
+    'http://localhost:3001',
+    'https://localhost:3001',
+  ],
+  credentials: true,
+};
 
 app.use((req, res, next) => {
   const { origin } = req.headers;
