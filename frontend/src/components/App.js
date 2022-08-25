@@ -210,7 +210,7 @@ function App() {
         setUserEmail(email);
         history.push("/");
       })
-      .catch(() => {
+      .catch((err) => {
         console.log(`Ошибка : ${err}`);
         setRegisterStatus(false);
         setIsInfoTooltipPopupOpen(true);
