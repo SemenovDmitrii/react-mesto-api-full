@@ -14,24 +14,30 @@ class Api {
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "GET",
-      credentials: 'include',
-      headers: this._headers,
+      headers: {
+        "Authorization": getToken(),
+        'Content-Type': 'application/json'
+      }
     }).then(this._serverResponse);
   }
 
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
       method: "GET",
-      credentials: 'include',
-      headers: this._headers,
+      headers: {
+        "Authorization": getToken(),
+        'Content-Type': 'application/json'
+      }
     }).then(this._serverResponse);
   }
 
   patchUserInfo(data) {
     return fetch(`${this._baseUrl}/users/me/`, {
       method: "PATCH",
-      credentials: 'include',
-      headers: this._headers,
+      headers: {
+        "Authorization": getToken(),
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         name: data.name,
         about: data.about,
@@ -42,8 +48,10 @@ class Api {
   postCard(data) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
-      credentials: 'include',
-      headers: this._headers,
+      headers: {
+        "Authorization": getToken(),
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         name: data.name,
         link: data.link,
@@ -54,35 +62,43 @@ class Api {
   deleteCard(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: "DELETE",
-      credentials: 'include',
-      headers: this._headers,
+      headers: {
+        "Authorization": getToken(),
+        'Content-Type': 'application/json'
+      },
     }).then(this._serverResponse);
   }
 
   putLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "PUT",
-      credentials: 'include',
-      headers: this._headers,
+      headers: {
+        "Authorization": getToken(),
+        'Content-Type': 'application/json'
+      }
     }).then(this._serverResponse);
   }
 
   deleteLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "DELETE",
-      credentials: 'include',
-      headers: this._headers,
+      headers: {
+        "Authorization": getToken(),
+        'Content-Type': 'application/json'
+      }
     }).then(this._serverResponse);
   }
 
   patchAvatar(data) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
-      method: "PATCH",
-      credentials: 'include',
-      headers: this._headers,
+      method: 'PATCH',
+      headers: {
+        "Authorization": getToken(),
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
-        avatar: data.avatar,
-      }),
+        avatar: data.avatar
+      })
     }).then(this._serverResponse);
   }
 }
@@ -93,8 +109,4 @@ const getToken = () => {
 
 export const api = new Api({
   baseUrl: 'https://api.sdv.nomoredomains.sbs', 
-  headers: {
-    "Authorization": getToken(),
-    'Content-Type': 'application/json'
-  },
 });

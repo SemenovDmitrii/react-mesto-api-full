@@ -142,7 +142,7 @@ module.exports.login = (req, res, next) => {
           expiresIn: '7d',
         },
       );
-      resres.send({ token })
+      res.send({ token })
     })
     .catch(() => {
       next(new UnauthorizedError('Неверный пароль или почта'));

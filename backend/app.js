@@ -25,8 +25,6 @@ const allowedCors = [
     'http://www.api.sdv.nomoredomains.sbs',
     'http://localhost:3000',
     'https://localhost:3000',
-    'http://localhost:3001',
-    'https://localhost:3001',
   ];
 
 app.use((req, res, next) => {
