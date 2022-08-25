@@ -15,8 +15,6 @@ const NotFoundError = require('./errors/NotFoundError');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-app.use(cors(allowedCors));
-
 const allowedCors = {
   origin: [
     'http://sdv.nomoredomains.sbs',
@@ -50,6 +48,8 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+app.use(cors(allowedCors));
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
