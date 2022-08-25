@@ -225,24 +225,24 @@ function App() {
   }
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
+<CurrentUserContext.Provider value={currentUser}>
       <div className="App">
-        <Header loggedIn={loggedIn} onLogout={onLogout} />
         <Switch>
-          <ProtectedRoute
-            exact
-            path="/"
-            loggedIn={loggedIn}
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
-            cards={cards}
-            component={Main}
-          />
-          <Footer />
+          <ProtectedRoute exact path="/" loggedIn={loggedIn}>
+            <Header loggedIn={loggedIn} onSignOut={onLogout} email={email} />
+
+            <Main
+              onEditProfile={handleEditProfileClick}
+              onAddPlace={handleAddPlaceClick}
+              onEditAvatar={handleEditAvatarClick}
+              onCardClick={handleCardClick}
+              onCardLike={handleCardLike}
+              onCardDelete={handleCardDelete}
+              cards={cards}
+            />
+
+            <Footer loggedIn={loggedIn}/>
+          </ProtectedRoute>
 
           <Route path="/sign-in">
             <Header authLink="sign-up" loggedIn={false} />
@@ -255,7 +255,7 @@ function App() {
           </Route>
 
           <Route exact path="*">
-            <Redirect to={loggedIn ? "/" : "/sign-in"} />
+            {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
           </Route>
         </Switch>
 
