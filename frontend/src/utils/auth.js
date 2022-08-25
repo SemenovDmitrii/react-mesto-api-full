@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://api.ulitina.mesto.nomoredomains.sbs';
+export const BASE_URL = 'https://api.sdv.nomoredomains.sbs';
 
 function serverResponse(res) {
     if (res.ok) {
