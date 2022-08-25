@@ -4,6 +4,7 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getUser,
   getUsers,
+  createUser,
   getCurrentUser,
   updateUser,
   updateAvatar,
@@ -23,6 +24,22 @@ router.get(
   getUser,
 );
 
+routerUsers.post(
+  '/signup',
+  celebrate({
+    body: Joi.object().keys({
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
+      avatar: Joi.string().pattern(
+        /^http[s]*:\/\/[a-z0-9.\-_~:/?#[\]@!$&'()*+,;=]+|www\.[a-z0-9.-_~:?#[\]@!$&'()*+,;=]+/,
+      ),
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
+    }),
+  }),
+  createUser,
+);
+
 router.patch(
   '/me',
   celebrate({
@@ -36,12 +53,25 @@ router.patch(
 
 router.patch(
   '/me/avatar',
-  celebrate(
-    {
-      body: Joi.object().keys({ avatar: Joi.string().required().uri({ scheme: ['http', 'https'] }) }),
-    },
-  ),
+  celebrate({
+    body: Joi.object().keys({
+      avatar: Joi.string().pattern(
+        /^http[s]*:\/\/[a-z0-9.\-_~:/?#[\]@!$&'()*+,;=]+|www\.[a-z0-9.-_~:?#[\]@!$&'()*+,;=]+/,
+      ),
+    }),
+  }),
   updateAvatar,
+);
+
+routerUsers.post(
+  '/signin',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().email().required(),
+      password: Joi.string().required(),
+    }),
+  }),
+  login,
 );
 
 module.exports = router;

@@ -20,7 +20,7 @@ function App() {
   const history = useHistory();
   const [registerStatus, setRegisterStatus] = React.useState(false);
   const [loggedIn, setLogged] = React.useState(false);
-  const [email, setEmail] = React.useState('')
+  // const [authLink, setAuthLink] = React.useState("sign-up");
   const [isInfoTooltipPopupOpen, setIsInfoTooltipPopupOpen] =
     React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
@@ -31,6 +31,7 @@ function App() {
   const [selectedCard, setSelectedCard] = React.useState({ isOpen: false });
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
+  const [email, setUserEmail] = React.useState("");
   const isOpen =
     isInfoTooltipPopupOpen ||
     isEditAvatarPopupOpen ||
@@ -68,11 +69,7 @@ function App() {
     api
       .deleteCard(card._id)
       .then(() => {
-        setCards((state) =>
-          state.filter((c) => {
-            return c._id !== card._id;
-          })
-        );
+        setCards((state) => state.filter((c) => c._id !== card._id));
       })
       .catch((err) => {
         console.log(`Ошибка : ${err}`);
@@ -158,111 +155,107 @@ function App() {
       });
   }
 
-  function tokenCheck() {
-    const jwt = localStorage.getItem('jwt')
+  React.useEffect(() => {
+    const jwt = localStorage.getItem("jwt");
     if (jwt) {
-      auth.checkToken(jwt)
+      auth
+        .checkToken(jwt)
         .then((res) => {
           if (res) {
-            setLogged(true)
-            setEmail(res.email)
-            history.push('/')
+            setLogged(true);
+            setUserEmail(res.email);
+            history.push("/");
+          } else {
+            setLogged(false);
+            setUserEmail("");
           }
         })
-        .catch((err) => console.log(err))
+        .catch((err) => console.log("Error: ", err));
     }
-  };
-
-  React.useEffect(() => {
-    tokenCheck()
   }, []);
 
-  function handleRegister(password, email) {
-    auth.register(password, email)
+  React.useEffect(() => {
+    if (loggedIn === true) {
+      Promise.all([api.getInitialCards(), api.getUserInfo()])
+        .then(([cards, userInfo]) => {
+          setCards(cards);
+          setCurrentUser(userInfo);
+        })
+        .catch((err) => console.log("Error: ", err));
+      history.push("/");
+    }
+  }, [loggedIn, history]);
+
+  function onRegister(password, email) {
+    auth
+      .register(password, email)
       .then((res) => {
-        if (res.statusCode !== 201) {
-          setEmail(res.email);
-          setRegisterStatus(true);
-          history.push("/sign-in");
-          setIsInfoTooltipPopupOpen(true);
-        }
+        setRegisterStatus(true);
+        setIsInfoTooltipPopupOpen(true);
+        history.push("/sign-in");
       })
       .catch((err) => {
+        console.log(`Ошибка : ${err}`);
         setRegisterStatus(false);
         setIsInfoTooltipPopupOpen(true);
-        console.log(`Ошибка : ${err}`);
       });
   }
 
-  function handleAuthorize(password, email) {
+  function onAuthorize(password, email) {
     auth
       .authorize(password, email)
-      .then((token) => {
-        auth.checkToken(token)
-        .then((res) => {
-          setLogged(true);
-          setEmail(res.email);
-          history.push("/");
-        })
+      .then((data) => {
+        localStorage.setItem("jwt", data.token);
+        setLogged(true);
+        setUserEmail(email);
+        history.push("/");
       })
-      .catch((err) => {
+      .catch(() => {
+        console.log(`Ошибка : ${err}`);
         setRegisterStatus(false);
         setIsInfoTooltipPopupOpen(true);
-        console.log(`Ошибка : ${err}`);
       });
   }
 
-  function onSignOut() {
-    localStorage.removeItem('jwt');
-    setLogged(false)
+  function onLogout() {
+    localStorage.removeItem("jwt");
+    setLogged(false);
+    history.push("/sign-in");
+    setUserEmail("");
   }
-
-
-
-  React.useEffect(() => {
-    if (loggedIn) {
-      Promise.all([api.getUserInfo(), api.getInitialCards()])
-        .then(([user, cards]) => {
-          setCurrentUser(user)
-          setCards(cards.reverse())
-        })
-        .catch((err) => console.log(err));
-      tokenCheck()
-    }
-  }, [loggedIn]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
+        <Header loggedIn={loggedIn} onLogout={onLogout} />
         <Switch>
-          <ProtectedRoute exact path="/" loggedIn={loggedIn}>
-            <Header loggedIn={loggedIn} onSignOut={onSignOut} email={email} />
-
-            <Main
-              onEditProfile={handleEditProfileClick}
-              onAddPlace={handleAddPlaceClick}
-              onEditAvatar={handleEditAvatarClick}
-              onCardClick={handleCardClick}
-              onCardLike={handleCardLike}
-              onCardDelete={handleCardDelete}
-              cards={cards}
-            />
-
-            <Footer loggedIn={loggedIn}/>
-          </ProtectedRoute>
+          <ProtectedRoute
+            exact
+            path="/"
+            loggedIn={loggedIn}
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            onEditAvatar={handleEditAvatarClick}
+            onCardClick={handleCardClick}
+            onCardLike={handleCardLike}
+            onCardDelete={handleCardDelete}
+            cards={cards}
+            component={Main}
+          />
+          <Footer />
 
           <Route path="/sign-in">
             <Header authLink="sign-up" loggedIn={false} />
-            <Login onAuthorize={handleAuthorize} />
+            <Login onAuthorize={onAuthorize} />
           </Route>
 
           <Route path="/sign-up">
             <Header authLink="sign-in" loggedIn={false} />
-            <Register onRegister={handleRegister} />
+            <Register onRegister={onRegister} />
           </Route>
 
           <Route exact path="*">
-            {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+            <Redirect to={loggedIn ? "/" : "/sign-in"} />
           </Route>
         </Switch>
 

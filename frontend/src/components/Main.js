@@ -37,12 +37,9 @@ function Main(props) {
 
       <section className="elements">
         <ul className="element-list">
-          {props.cards.slice().reverse().map((card) => (
+          {props.cards.map((card) => (
             <Card
               card={card}
-              name={card.name}
-              link={card.link}
-              likes={card.likes}
               onCardClick={props.onCardClick}
               onCardLike={props.onCardLike}
               onCardDelete={props.onCardDelete}

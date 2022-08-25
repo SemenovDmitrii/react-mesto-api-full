@@ -1,54 +1,43 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
 const mongoose = require('mongoose');
-const app = express();
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { errors } = require('celebrate');
-const router = require('./routes');
+const { login, createUser } = require('./controllers/user');
+const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { createUserValidator, loginValidator } = require('../utils/celebrate-validators');
 
-const {
-  PORT = 3000,
-  NODE_ENV,
-  MONGODB_ADDRESS,
-} = process.env;
+const { mongoDbServer, port } = require('./utils/config');
 
+const { PORT = port, MONGO_DB_SERVER = mongoDbServer } = process.env;
 
-const allowedCors = [
-    'http://sdv.nomoredomains.sbs',
-    'https://sdv.nomoredomains.sbs',
-    'http://api.sdv.nomoredomains.sbs',
-    'https://api.sdv.nomoredomains.sbs',
-    'https://www.api.sdv.nomoredomains.sbs',
-    'http://www.api.sdv.nomoredomains.sbs',
-    'http://localhost:3000',
-    'https://localhost:3000',
-    'http://localhost:3001',
-    'https://localhost:3001',
-  ];
+const app = express();
 
-app.use((req, res, next) => {
-  const { origin } = req.headers;
-  const { method } = req;
-  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
-  const requestHeaders = req.headers['access-control-request-headers'];
-  if (allowedCors.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Credentials', true);
-  }
-  if (method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
-    res.header('Access-Control-Allow-Headers', requestHeaders);
-    return res.end();
-  }
-  next();
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-app.use(cors(allowedCors));
+app.use(limiter);
+
+app.use(require('./middlewares/cors'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(helmet());
+
+mongoose.connect(
+  MONGO_DB_SERVER,
+  { useNewUrlParser: true },
+);
+
+app.use(requestLogger);
 
 app.get('/crash-test', () => {
   setTimeout(() => {
@@ -56,9 +45,18 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.use(requestLogger);
+app.post('/signin', loginValidator, login);
+app.post('/signup', createUserValidator, createUser);
 
-app.use(router);
+app.use(auth);
+
+app.use('/users', require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
+
+
+app.use((req, res, next) => {
+  next(new NotFoundError('Запрашиваемый ресурс не найден'));
+});
 
 app.use(errorLogger);
 
@@ -70,11 +68,6 @@ app.use((err, req, res, next) => {
     message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
   });
   next();
-});
-
-mongoose.connect((NODE_ENV === 'production' ? MONGODB_ADDRESS : 'mongodb://localhost:27017/mestodb'), {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
 });
 
 app.listen(PORT, () => {

@@ -16,8 +16,12 @@ router.post(
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30).required(),
-      link: Joi.string().uri({ scheme: ['http', 'https'] }).required(),
-    }).unknown(true),
+      link: Joi.string()
+        .pattern(
+          /^http[s]*:\/\/[a-z0-9.\-_~:/?#[\]@!$&'()*+,;=]+|www\.[a-z0-9.-_~:?#[\]@!$&'()*+,;=]+/,
+        )
+        .required(),
+    }),
   }),
   createCard,
 );
