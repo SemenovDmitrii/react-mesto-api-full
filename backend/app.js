@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
+const cors = require('./middlewares/cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -15,21 +15,7 @@ const NotFoundError = require('./errors/NotFoundError');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-app.use(cors({
-  origin: [
-    'http://sdv.nomoredomains.sbs',
-    'https://sdv.nomoredomains.sbs',
-    'http://api.sdv.nomoredomains.sbs',
-    'https://api.sdv.nomoredomains.sbs',
-    'https://www.api.sdv.nomoredomains.sbs',
-    'http://www.api.sdv.nomoredomains.sbs',
-    'http://localhost:3000',
-    'https://localhost:3000',
-    'http://localhost:3001',
-    'https://localhost:3001',
-  ],
-  credentials: true,
-}));
+app.use(cors);
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
