@@ -49,11 +49,7 @@ app.use((req, res, next) => {
   next();
 });
 
-mongoose.connect((NODE_ENV === 'production' ? MONGODB : 'mongodb://localhost:27017/mestodb'), {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-  useCreateIndex: true,
-});
+
 
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -88,6 +84,11 @@ app.use((err, req, res, next) => {
     message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
   });
   next();
+});
+
+mongoose.connect((NODE_ENV === 'production' ? MONGODB : 'mongodb://localhost:27017/mestodb'), {
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
 });
 
 app.listen(PORT);
