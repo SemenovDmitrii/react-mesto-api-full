@@ -1,4 +1,4 @@
-export const BASE_URL = "https://api.sdv.nomoredomains.sbs";
+export const BASE_URL = 'https://api.sdv.nomoredomains.sbs';
 
 function serverResponse(res) {
   if (res.ok) {
@@ -10,11 +10,16 @@ function serverResponse(res) {
 
 export const register = (password, email) => {
   return fetch(`${BASE_URL}/signup`, {
-    method: "POST",
+    method: 'POST',
+    credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify({ password, email }),
+    body: JSON.stringify({ 
+      "password": password,
+      "email": email
+    }),
   })
   .then(serverResponse);
 };
@@ -22,10 +27,15 @@ export const register = (password, email) => {
 export const authorize = (email, password) => {
   return fetch(`${BASE_URL}/signin`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
-        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({ password, email }),
+      body: JSON.stringify({
+        "password": password,
+        "email": email
+      })
     })
     .then(serverResponse)
     .then((data) => {
@@ -41,6 +51,7 @@ export const checkToken = (token) => {
       method: 'GET',
       credentials: 'include',
       headers: {
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
         "Authorization" : `Bearer ${token}`
       },
