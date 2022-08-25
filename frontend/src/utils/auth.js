@@ -1,6 +1,6 @@
 export const BASE_URL = 'https://api.sdv.nomoredomains.sbs';
 
-function serverResponse(res) {
+const serverResponse = (res) => {
   if (res.ok) {
     return res.json();
   } else {
@@ -22,10 +22,11 @@ export const register = (password, email) => {
   .then(serverResponse);
 };
 
-export const authorize = (email, password) => {
+export const authorize = (password, email) => {
   return fetch(`${BASE_URL}/signin`, {
       method: 'POST',
       headers: {
+        'Accept': 'application/json',
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -46,8 +47,9 @@ export const checkToken = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
       method: 'GET',
       headers: {
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
-        "Authorization" : `Bearer ${token}`
+        "Authorization": `Bearer ${token}`
       },
     }).then(serverResponse);
   };

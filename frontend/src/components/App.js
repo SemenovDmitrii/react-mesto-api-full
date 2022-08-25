@@ -158,7 +158,26 @@ function App() {
       });
   }
 
-  function onRegister(password, email) {
+  function tokenCheck() {
+    const jwt = localStorage.getItem('jwt')
+    if (jwt) {
+      auth.checkToken(jwt)
+        .then((res) => {
+          if (res) {
+            setLogged(true)
+            setEmail(res.email)
+            history.push('/')
+          }
+        })
+        .catch((err) => console.log(err))
+    }
+  };
+
+  React.useEffect(() => {
+    tokenCheck()
+  }, []);
+
+  function handleRegister(password, email) {
     auth.register(password, email)
       .then((res) => {
         if (res.statusCode !== 201) {
@@ -175,7 +194,7 @@ function App() {
       });
   }
 
-  function onAuthorize(password, email) {
+  function handleAuthorize(password, email) {
     auth
       .authorize(password, email)
       .then((token) => {
@@ -198,24 +217,7 @@ function App() {
     setLogged(false)
   }
 
-  function tokenCheck() {
-    const jwt = localStorage.getItem('jwt')
-    if (jwt) {
-      auth.checkToken(jwt)
-        .then((res) => {
-          if (res) {
-            setLogged(true)
-            setEmail(res.email)
-            history.push('/')
-          }
-        })
-        .catch((err) => console.log(err))
-    }
-  };
 
-  React.useEffect(() => {
-    tokenCheck()
-  }, []);
 
   React.useEffect(() => {
     if (loggedIn) {
@@ -251,16 +253,16 @@ function App() {
 
           <Route path="/sign-in">
             <Header authLink="sign-up" loggedIn={false} />
-            <Login onAuthorize={onAuthorize} />
+            <Login onAuthorize={handleAuthorize} />
           </Route>
 
           <Route path="/sign-up">
             <Header authLink="sign-in" loggedIn={false} />
-            <Register onRegister={onRegister} />
+            <Register onRegister={handleRegister} />
           </Route>
 
-          <Route exact path="/">
-            {loggedIn ? <Redirect to="sign-up" /> : <Redirect to="/sign-in" />}
+          <Route exact path="*">
+            {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
           </Route>
         </Switch>
 
