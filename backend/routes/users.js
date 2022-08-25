@@ -44,4 +44,4 @@ router.patch(
   updateAvatar,
 );
 
-module.exports = routerUsers;
+module.exports = router;

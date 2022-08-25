@@ -52,4 +52,4 @@ router.delete(
   dislikeCard,
 );
 
-module.exports = routerCards;
+module.exports = router;
