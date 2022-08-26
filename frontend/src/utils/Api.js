@@ -15,6 +15,7 @@ class Api {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "GET",
       headers: this._headers,
+      credentials: 'include',
     }).then(this._serverResponse);
   }
 
@@ -22,6 +23,7 @@ class Api {
     return fetch(`${this._baseUrl}/cards`, {
       method: "GET",
       headers: this._headers,
+      credentials: 'include',
     }).then(this._serverResponse);
   }
 
@@ -33,6 +35,7 @@ class Api {
         name: data.name,
         about: data.about,
       }),
+      credentials: 'include',
     }).then(this._serverResponse);
   }
 
@@ -44,6 +47,7 @@ class Api {
         name: data.name,
         link: data.link,
       }),
+      credentials: 'include',
     }).then(this._serverResponse);
   }
 
@@ -51,6 +55,7 @@ class Api {
     return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: "DELETE",
       headers: this._headers,
+      credentials: 'include',
     }).then(this._serverResponse);
   }
 
@@ -58,6 +63,7 @@ class Api {
     return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
       method: "PUT",
       headers: this._headers,
+      credentials: 'include',
     }).then(this._serverResponse);
   }
 
@@ -65,6 +71,7 @@ class Api {
     return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
       method: "DELETE",
       headers: this._headers,
+      credentials: 'include',
     }).then(this._serverResponse);
   }
 
@@ -75,13 +82,16 @@ class Api {
       body: JSON.stringify({
         avatar: data.avatar,
       }),
+      credentials: 'include',
     }).then(this._serverResponse);
   }
 }
-export const api = new Api({
+const api = new Api({
   baseUrl: 'https://api.sdv.nomoredomains.sbs',
   headers: () => ({
     'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
     'Content-Type': 'application/json'
 })
 });
+
+export default api;
