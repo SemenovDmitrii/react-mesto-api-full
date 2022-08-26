@@ -58,7 +58,7 @@ function App() {
   }, []);
 
   React.useEffect(() => {
-    if (loggedIn) {
+    if (loggedIn === true) {
       Promise.all([api.getInitialCards(), api.getUserInfo()])
         .then(([cards, userInfo]) => {
           setCards(cards);

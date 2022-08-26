@@ -8,7 +8,7 @@ class Api {
     if (res.ok) {
       return res.json();
     }
-    return Promise.reject("Произошла ошибка");
+    return Promise.reject(`Ошибка: ${res.status}`);
   }
 
   getUserInfo() {
@@ -28,14 +28,14 @@ class Api {
   }
 
   patchUserInfo(data) {
-    return fetch(`${this._baseUrl}/users/me/`, {
+    return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
       headers: this._headers,
+      credentials: 'include',
       body: JSON.stringify({
         name: data.name,
         about: data.about,
       }),
-      credentials: 'include',
     }).then(this._serverResponse);
   }
 
@@ -43,11 +43,11 @@ class Api {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
       headers: this._headers,
+      credentials: 'include',
       body: JSON.stringify({
         name: data.name,
         link: data.link,
       }),
-      credentials: 'include',
     }).then(this._serverResponse);
   }
 
@@ -79,10 +79,10 @@ class Api {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
       headers: this._headers,
+      credentials: 'include',
       body: JSON.stringify({
         avatar: data.avatar,
       }),
-      credentials: 'include',
     }).then(this._serverResponse);
   }
 }

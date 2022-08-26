@@ -1,15 +1,19 @@
-export const BASE_URL = 'https://api.sdv.nomoredomains.sbs';
+const BASE_URL = 'https://api.sdv.nomoredomains.sbs';
 
 const serverResponse = (res) => {
     if (res.ok) {
         return res.json();
     }
-    return Promise.reject(`Ошибка: ${res.status}`);
+    return res.json()
+    .then((err) => {
+      throw err;
+    })
 };
 
 export const register = (email, password) => {
     return fetch(`${BASE_URL}/signup`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -18,13 +22,14 @@ export const register = (email, password) => {
             "email": email,
             "password": password
          }),
-         credentials: 'include',
+        
     }).then(serverResponse);
 };
 
 export const authorize = (email, password) => {
     return fetch(`${BASE_URL}/signin`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -33,7 +38,6 @@ export const authorize = (email, password) => {
             "email": email,
             "password": password
          }),
-         credentials: 'include',
     }).then(serverResponse);
 };
 
