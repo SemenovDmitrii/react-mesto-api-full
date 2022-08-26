@@ -78,13 +78,10 @@ class Api {
     }).then(this._serverResponse);
   }
 }
-
-const api = new Api({
+export const api = new Api({
   baseUrl: 'https://api.sdv.nomoredomains.sbs',
   headers: () => ({
     'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
     'Content-Type': 'application/json'
 })
 });
-
-export default api;
