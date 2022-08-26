@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
+import { api } from "../utils/Api.js";
+import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
+import Login from "./Login";
+import Register from "./Register";
 import * as auth from "../utils/auth.js";
 import Header from "./Header";
 import Main from "./Main";
@@ -11,10 +15,6 @@ import AddPlacePopup from "./AddPlacePopup";
 import ImagePopup from "./ImagePopup";
 import InfoTooltip from "./InfoTooltip";
 import ProtectedRoute from "./ProtectedRoute";
-import Login from "./Login";
-import Register from "./Register";
-import api from "../utils/Api.js";
-import CurrentUserContext from "../contexts/CurrentUserContext.js";
 
 function App() {
   const history = useHistory();
