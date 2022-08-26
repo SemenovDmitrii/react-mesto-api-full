@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect, useState } from "react";
 import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import * as auth from "../utils/auth.js";
 import Header from "./Header";
@@ -30,7 +31,7 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({ isOpen: false });
   const [currentUser, setCurrentUser] = React.useState({});
-  const [cards, setCards] = React.useState([]);
+  const [cards, setCards] = useState([]);
   const [email, setUserEmail] = React.useState("");
   const isOpen =
     isInfoTooltipPopupOpen ||
@@ -98,7 +99,7 @@ function App() {
     setSelectedCard({ isOpen: false });
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     function closeByEscape(evt) {
       if (evt.key === "Escape") {
         closeAllPopups();
@@ -155,7 +156,7 @@ function App() {
       });
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const jwt = localStorage.getItem("jwt");
     if (jwt) {
       auth
@@ -170,11 +171,11 @@ function App() {
             setUserEmail("");
           }
         })
-        .catch((err) => console.log("Error: ", err));
+        .catch((err) => console.log(`Ошибка : ${err}`));
     }
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (loggedIn === true) {
       Promise.all([api.getInitialCards(), api.getUserInfo()])
         .then(([cards, userInfo]) => {
@@ -225,7 +226,7 @@ function App() {
   }
 
   return (
-<CurrentUserContext.Provider value={currentUser}>
+    <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
         <Switch>
           <ProtectedRoute exact path="/" loggedIn={loggedIn}>
@@ -241,7 +242,7 @@ function App() {
               cards={cards}
             />
 
-            <Footer loggedIn={loggedIn}/>
+            <Footer loggedIn={loggedIn} />
           </ProtectedRoute>
 
           <Route path="/sign-in">
