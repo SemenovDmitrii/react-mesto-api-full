@@ -1,11 +1,11 @@
 export const BASE_URL = 'https://api.sdv.nomoredomains.sbs';
 
-function serverResponse(res) {
+const serverResponse = (res) => {
     if (res.ok) {
         return res.json();
     }
-    return Promise.reject(res.status);
-}
+    return Promise.reject(`Ошибка: ${res.status}`);
+};
 
 export const register = (email, password) => {
     return fetch(`${BASE_URL}/signup`, {
@@ -45,4 +45,4 @@ export const checkToken = (token) => {
         }
     })
         .then(serverResponse);
-}
+};

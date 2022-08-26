@@ -1,6 +1,5 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import { Route, Switch, Redirect, useHistory } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Route, Switch, Redirect, useHistory } from 'react-router-dom';
 import * as auth from "../utils/auth.js";
 import Header from "./Header";
 import Main from "./Main";
@@ -14,25 +13,24 @@ import InfoTooltip from "./InfoTooltip";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "./Login";
 import Register from "./Register";
-import { api } from "../utils/Api.js";
-import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
+import api from "../utils/Api.js";
+import CurrentUserContext from "../contexts/CurrentUserContext.js";
 
 function App() {
   const history = useHistory();
-  const [registerStatus, setRegisterStatus] = React.useState(false);
-  const [loggedIn, setLogged] = React.useState(false);
-  // const [authLink, setAuthLink] = React.useState("sign-up");
+  const [registerStatus, setRegisterStatus] = useState(false);
+  const [loggedIn, setLogged] = useState(false);
   const [isInfoTooltipPopupOpen, setIsInfoTooltipPopupOpen] =
-    React.useState(false);
+    useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
-    React.useState(false);
+    useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =
-    React.useState(false);
-  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
-  const [selectedCard, setSelectedCard] = React.useState({ isOpen: false });
-  const [currentUser, setCurrentUser] = React.useState({});
+    useState(false);
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState({ isOpen: false });
+  const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
-  const [email, setUserEmail] = React.useState("");
+  const [email, setUserEmail] = useState("");
   const isOpen =
     isInfoTooltipPopupOpen ||
     isEditAvatarPopupOpen ||
@@ -171,7 +169,7 @@ function App() {
             setUserEmail("");
           }
         })
-        .catch((err) => console.log(`Ошибка : ${err}`));
+        .catch((err) => console.log("Error: ", err));
     }
   }, []);
 
@@ -226,7 +224,7 @@ function App() {
   }
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
+<CurrentUserContext.Provider value={currentUser}>
       <div className="App">
         <Switch>
           <ProtectedRoute exact path="/" loggedIn={loggedIn}>
@@ -242,7 +240,7 @@ function App() {
               cards={cards}
             />
 
-            <Footer loggedIn={loggedIn} />
+            <Footer loggedIn={loggedIn}/>
           </ProtectedRoute>
 
           <Route path="/sign-in">
