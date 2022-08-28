@@ -38,36 +38,69 @@ function App() {
     isAddPlacePopupOpen ||
     selectedCard.isOpen;
 
-  React.useEffect(() => {
-    const jwt = localStorage.getItem("jwt");
-    if (jwt) {
+    React.useEffect(() => {
+    checkToken();
+    if (loggedIn) {
+      history.push("/");
+      Promise.all([api.getUserInfo(), api.getInitialCards()])
+        .then(([userInfo, cards]) => {
+          setCurrentUser(userInfo);
+          setCards(cards.reverse());
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [loggedIn]);
+
+  const checkToken = () => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      setLogged(true);
       auth
-        .checkToken(jwt)
+        .checkToken(token)
         .then((res) => {
           if (res) {
-            setLogged(true);
             setUserEmail(res.email);
-            history.push("/");
-          } else {
-            setLogged(false);
-            setUserEmail("");
           }
+          history.push("/");
         })
-        .catch((err) => console.log("Error: ", err));
+        .catch((err) => {
+          console.log(err);
+        });
     }
-  }, []);
+  };
 
-  React.useEffect(() => {
-    if (loggedIn === true) {
-      Promise.all([api.getInitialCards(), api.getUserInfo()])
-        .then(([cards, userInfo]) => {
-          setCards(cards);
-          setCurrentUser(userInfo);
-        })
-        .catch((err) => console.log("Error: ", err));
-      history.push("/");
-    }
-  }, [loggedIn, history]);
+  // React.useEffect(() => {
+  //   const jwt = localStorage.getItem("jwt");
+  //   if (jwt) {
+  //     auth
+  //       .checkToken(jwt)
+  //       .then((res) => {
+  //         if (res) {
+  //           setLogged(true);
+  //           setUserEmail(res.email);
+  //           history.push("/");
+  //         } else {
+  //           setLogged(false);
+  //           setUserEmail("");
+  //         }
+  //       })
+  //       .catch((err) => console.log("Error: ", err));
+  //   }
+  // }, []);
+
+  // React.useEffect(() => {
+  //   if (loggedIn === true) {
+  //     Promise.all([api.getInitialCards(), api.getUserInfo()])
+  //       .then(([cards, userInfo]) => {
+  //         setCards(cards);
+  //         setCurrentUser(userInfo);
+  //       })
+  //       .catch((err) => console.log("Error: ", err));
+  //     history.push("/");
+  //   }
+  // }, [loggedIn, history]);
 
   function onRegister(email, password) {
     auth

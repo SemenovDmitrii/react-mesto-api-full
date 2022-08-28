@@ -2,40 +2,22 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const { errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { createUserValidator, loginValidator } = require('./utils/celebrate-validators');
-
-const { mongoDbServer, port } = require('./utils/config');
-
-const { PORT = port, MONGO_DB_SERVER = mongoDbServer } = process.env;
+const { validateUserCreate, validateUserLogin } = require('./middlewares/celebrate');
 
 const app = express();
+const { PORT = 3000 } = process.env;
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use(limiter);
+mongoose.connect('mongodb://localhost:27017/myDB');
 
 app.use(require('./middlewares/cors'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(helmet());
-
-mongoose.connect(
-  MONGO_DB_SERVER,
-  { useNewUrlParser: true },
-);
 
 app.use(requestLogger);
 
@@ -45,8 +27,8 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signin', loginValidator, login);
-app.post('/signup', createUserValidator, createUser);
+app.post('/signup', validateUserCreate, createUser);
+app.post('/signin', validateUserLogin, login);
 
 app.use(auth);
 

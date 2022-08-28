@@ -1,97 +1,90 @@
 class Api {
-  constructor({ baseUrl, headers }) {
+  constructor({ baseUrl }) {
     this._baseUrl = baseUrl;
-    this._headers = headers;
   }
 
   _serverResponse(res) {
     if (res.ok) {
-      return res.json();
+      return res.json()
+  } else {
+      return Promise.reject(res.status)
     }
-    return Promise.reject(`Ошибка: ${res.status}`);
   }
+  get _headers() {
+    return {
+        authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        'Content-Type': 'application/json'
+    }
+}
 
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, {
-      method: "GET",
-      headers: this._headers,
-      credentials: 'include',
-    }).then(this._serverResponse);
+      headers: this._headers
+    }).then(this._checkResponse);
   }
 
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
-      method: "GET",
-      headers: this._headers,
-      credentials: 'include',
-    }).then(this._serverResponse);
+      headers: this._headers
+    }).then(this._checkResponse);
   }
 
-  patchUserInfo(data) {
+  patchUserInfo(name, about) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
       headers: this._headers,
-      credentials: 'include',
       body: JSON.stringify({
-        name: data.name,
-        about: data.about,
+        name,
+        about,
       }),
-    }).then(this._serverResponse);
+    }).then(this._checkResponse);
   }
 
-  postCard(data) {
+  postCard(name, link) {
     return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
       headers: this._headers,
-      credentials: 'include',
       body: JSON.stringify({
-        name: data.name,
-        link: data.link,
+        name,
+        link,
       }),
-    }).then(this._serverResponse);
+    }).then(this._checkResponse);
   }
 
   deleteCard(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: "DELETE",
       headers: this._headers,
-      credentials: 'include',
-    }).then(this._serverResponse);
+    }).then(this._checkResponse);
   }
 
   putLike(cardId) {
-    return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "PUT",
       headers: this._headers,
-      credentials: 'include',
     }).then(this._serverResponse);
   }
 
   deleteLike(cardId) {
-    return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
       method: "DELETE",
       headers: this._headers,
-      credentials: 'include',
     }).then(this._serverResponse);
   }
 
-  patchAvatar(data) {
+  patchAvatar(avatar) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
       headers: this._headers,
-      credentials: 'include',
       body: JSON.stringify({
-        avatar: data.avatar,
+        avatar,
       }),
-    }).then(this._serverResponse);
+    }).then(this._checkResponse);
   }
 }
+
 const api = new Api({
   baseUrl: 'https://api.sdv.nomoredomains.sbs',
-  headers: () => ({
-    'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
-    'Content-Type': 'application/json'
-})
 });
 
 export default api;
