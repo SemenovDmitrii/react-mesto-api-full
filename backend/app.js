@@ -3,23 +3,37 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-const { login, createUser } = require('./controllers/users');
-const auth = require('./middlewares/auth');
-const NotFoundError = require('./errors/NotFoundError');
+const cors = require('cors');
+const { createUser, login } = require('./controllers/users');
+const routerUsers = require('./routes/users');
+const routerCards = require('./routes/cards');
+const { onAuth } = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { validateUserCreate, validateUserLogin } = require('./middlewares/celebrate');
-
-const app = express();
+const { validateUser, validateAuthorization } = require('./middlewares/validation');
+const NotFoundError = require('./errors/NotFoundError');
 const { PORT = 3000 } = process.env;
+const app = express();
 
-mongoose.connect('mongodb://localhost:27017/myDB');
-
-app.use(require('./middlewares/cors'));
+app.use(cors({
+  origin: [
+    'https://sdv.nomoredomains.sbs',
+    'http://sdv.nomoredomains.sbs',
+    'http://localhost:3000',
+  ],
+  credentials: true,
+}));
 
 app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({ extended: true }));
 
+mongoose.connect('mongodb://localhost:27017/mestodb');
+
 app.use(requestLogger);
+
+app.post('/signin', validateAuthorization, login);
+
+app.post('/signup', validateUser, createUser);
 
 app.get('/crash-test', () => {
   setTimeout(() => {
@@ -27,16 +41,12 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signup', validateUserCreate, createUser);
-app.post('/signin', validateUserLogin, login);
+app.use('/users', onAuth, routerUsers);
 
-app.use(auth);
+app.use('/cards', onAuth, routerCards);
 
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
-
-app.use(() => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден');
+app.use((req, res, next) => {
+  next(new NotFoundError('Запрашиваемый ресурс не найден'));
 });
 
 app.use(errorLogger);

@@ -6,7 +6,6 @@ function Login(props) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!email.current.value || !password.current.value){ return; }
     props.onAuthorize(password.current.value, email.current.value);
   }
 

@@ -1,90 +1,116 @@
 class Api {
-  constructor({ baseUrl }) {
+  constructor({ baseUrl, headers }) {
     this._baseUrl = baseUrl;
+    this._headers = headers;
   }
 
   _serverResponse(res) {
     if (res.ok) {
-      return res.json()
-  } else {
-      return Promise.reject(res.status)
+      return res.json();
     }
-  }
-  get _headers() {
-    return {
-        authorization: `Bearer ${localStorage.getItem('jwt')}`,
-        'Content-Type': 'application/json'
-    }
-}
-
-  getUserInfo() {
-    return fetch(`${this._baseUrl}/users/me`, {
-      headers: this._headers
-    }).then(this._checkResponse);
+    return Promise.reject("Произошла ошибка");
   }
 
-  getInitialCards() {
-    return fetch(`${this._baseUrl}/cards`, {
-      headers: this._headers
-    }).then(this._checkResponse);
+  getUserInfo(token) {
+    return fetch(`${this.baseURL}/users/me`, {
+      credentials: 'include',
+      method: 'GET',
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    })
+      .then(this._serverResponse);
   }
 
-  patchUserInfo(name, about) {
-    return fetch(`${this._baseUrl}/users/me`, {
+  getInitialCards(token) {
+    return fetch(`${this.baseURL}/cards`, {
+      credentials: 'include',
+      headers: {
+        authorization: `Bearer ${token}`
+      },
+    })
+      .then(this._serverResponse);
+  }
+
+  patchUserInfo({ name, about }, token) {
+    return fetch(`${this.baseURL}/users/me`, {
+      credentials: 'include',
       method: "PATCH",
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         name,
         about,
       }),
-    }).then(this._checkResponse);
+    })
+      .then(this._serverResponse);
   }
 
-  postCard(name, link) {
-    return fetch(`${this._baseUrl}/cards`, {
+  postCard({ name, link }, token) {
+    return fetch(`${this.baseURL}/cards`, {
+      credentials: 'include',
       method: "POST",
-      headers: this._headers,
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         name,
         link,
       }),
-    }).then(this._checkResponse);
+    }).then(this._serverResponse);
   }
 
-  deleteCard(cardId) {
-    return fetch(`${this._baseUrl}/cards/${cardId}`, {
+  deleteCard(id, token) {
+    return fetch(`${this.baseURL}/cards/${id}`, {
       method: "DELETE",
-      headers: this._headers,
-    }).then(this._checkResponse);
+      credentials: 'include',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+    }).then(this._serverResponse);
   }
 
-  putLike(cardId) {
-    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+  putLike(id, token) {
+    return fetch(`${this.baseURL}/cards/${id}/likes`, {
       method: "PUT",
-      headers: this._headers,
+      credentials: 'include',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
     }).then(this._serverResponse);
   }
 
-  deleteLike(cardId) {
-    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+  deleteLike(id, token) {
+    return fetch(`${this.baseURL}/cards/${id}/likes`, {
       method: "DELETE",
-      headers: this._headers,
+      credentials: 'include',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
     }).then(this._serverResponse);
   }
 
-  patchAvatar(avatar) {
-    return fetch(`${this._baseUrl}/users/me/avatar`, {
+  patchAvatar(avatar, token) {
+    return fetch(`${this.baseURL}/users/me/avatar`, {
       method: "PATCH",
-      headers: this._headers,
+      credentials: 'include',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        avatar,
+        avatar: avatar,
       }),
-    }).then(this._checkResponse);
+    }).then(this._serverResponse);
   }
 }
 
-const api = new Api({
-  baseUrl: 'https://api.sdv.nomoredomains.sbs',
+export const api = new Api({
+   baseURL: 'https://api.sdv.nomoredomains.sbs',
 });
-
-export default api;
