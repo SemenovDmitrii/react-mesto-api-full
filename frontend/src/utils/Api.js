@@ -1,7 +1,6 @@
-class Api {
-  constructor({ baseUrl, headers }) {
-    this._baseUrl = baseUrl;
-    this._headers = headers;
+export class Api {
+  constructor(config) {
+    this.baseURL = config.baseURL
   }
 
   _serverResponse(res) {
