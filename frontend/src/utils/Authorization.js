@@ -1,45 +1,46 @@
 export const BASE_URL = 'https://api.sdv.nomoredomains.sbs';
 
-function checkResponse(res) {
+const checkResponse = (res) => {
   if (res.ok) {
-    return res.json()
+    return res.json();
   }
-  else {
-    return Promise.reject(`Ошибка ${res.status}: ${res.statusText}`)
-  }
-}
+  return Promise.reject(`Ошибка: ${res.status}`);
+};
 
 export const registration = (email, password) => {
   return fetch(`${BASE_URL}/signup`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ password, email  })
-  })
-  .then(checkResponse);
+    body: JSON.stringify({ email, password }),
+  }).then(checkResponse);
 };
 
 export const authorize = (email, password) => {
   return fetch(`${BASE_URL}/signin`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
+      Accept: "application/json",
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email, password })
-  })
-  .then((res) => checkResponse(res));
+    body: JSON.stringify({ email, password }),
+  }).then(checkResponse);
 };
 
 export const checkToken = (token) => {
   return fetch(`${BASE_URL}/users/me`, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    }
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
   })
-  .then((res) => checkResponse(res));
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+    })
+    .then((response) => response);
 };
