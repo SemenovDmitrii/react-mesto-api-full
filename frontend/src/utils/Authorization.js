@@ -1,59 +1,45 @@
-export class Auth {
-  constructor(config) {
-    this.baseURL = config.baseURL;
+export const BASE_URL = 'https://api.sdv.nomoredomains.sbs';
+
+function checkResponse(res) {
+  if (res.ok) {
+    return res.json()
   }
-
-  _handleError(res) {
-    return res.ok ? res.json() : Promise.reject(res.status);
-  }
-
-  registration = (password, email) => {
-    return fetch(`${this.baseURL}/signup`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-    }).then((res) => this._handleError(res));
-  };
-
-  authorize(email, password) {
-    return fetch(`${this.baseURL}/signin`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ password, email }),
-    })
-      .then((res) => this._handleError(res))
-      .then((res) => {
-        if (res.token) {
-          localStorage.setItem("jwt", res.token);
-          localStorage.setItem("email", email);
-          return res;
-        }
-      });
-  }
-
-  checkToken(token) {
-    return fetch(`${this.baseURL}/users/me`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => this._handleError(res))
-      .then((res) => res.data);
+  else {
+    return Promise.reject(`Ошибка ${res.status}: ${res.statusText}`)
   }
 }
 
-export const auth = new Auth({
-  baseURL: "https://api.sdv.nomoredomains.sbs",
-});
+export const registration = (email, password) => {
+  return fetch(`${BASE_URL}/signup`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ password, email  })
+  })
+  .then(checkResponse);
+};
+
+export const authorize = (email, password) => {
+  return fetch(`${BASE_URL}/signin`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email, password })
+  })
+  .then((res) => checkResponse(res));
+};
+
+export const checkToken = (token) => {
+  return fetch(`${BASE_URL}/users/me`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    }
+  })
+  .then((res) => checkResponse(res));
+};

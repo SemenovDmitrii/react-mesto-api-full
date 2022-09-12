@@ -1,5 +1,4 @@
 import React from "react";
-import { useState, useEffect } from "react";
 import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import * as auth from "../utils/Authorization.js";
 import Header from "./Header";
@@ -46,33 +45,67 @@ function App() {
     history.push("/signin");
   }
 
-  useEffect(() => {
-    const token = localStorage.getItem("jwt");
-    if (token) {
-      auth
-        .checkToken(token)
-        .then((data) => {
-          setLogged(true);
-          setUserEmail(data.email);
-          history.push("/");
-        })
-        .catch((err) => console.log(err));
-    }
-  }, [history]);
+  // React.useEffect(() => {
+  //   const token = localStorage.getItem("jwt");
+  //   if (token) {
+  //     auth
+  //       .checkToken(token)
+  //       .then((data) => {
+  //         setLogged(true);
+  //         setUserEmail(data.email);
+  //         history.push("/");
+  //       })
+  //       .catch((err) => console.log(err));
+  //   }
+  // }, [history]);
 
-  useEffect(() => {
+  // React.useEffect(() => {
+  //   if (loggedIn) {
+  //     Promise.all([api.getUserInfo(token), api.getInitialCards(token)])
+  //       .then((resData) => {
+  //         const [userData, cardList] = resData;
+  //         setCurrentUser(userData.data);
+  //         setCards(cardList.reverse());
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   }
+  // }, [loggedIn, token]);
+
+  React.useEffect(() => {
+    loadToken();
     if (loggedIn) {
-      Promise.all([api.getProfile(token), api.getInitialCards(token)])
-        .then((resData) => {
-          const [userData, cardList] = resData;
-          setCurrentUser(userData.data);
-          setCards(cardList.reverse());
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      history.push('/');
+    Promise.all([api.getUserInfo(), api.getInitialCards()])
+      .then(([userInfo, cards]) => {
+        setCurrentUser(userInfo);
+        setCards(cards.reverse());
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      }
+  }, [loggedIn]);
+
+  const loadToken = () => {
+    const token = localStorage.getItem('jwt');
+    if(token) {
+      setLogged(true);
+    auth
+      .checkToken(token)
+      .then((res) => {
+        if(res) {
+          setUserEmail(res.email)
+        };
+        history.push('/');
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     }
-  }, [loggedIn, token]);
+  }
+
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
@@ -234,22 +267,22 @@ function App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
-        <Header loggedIn={loggedIn} onLogout={handleSignOut} />
-
         <Switch>
-          <ProtectedRoute
-            exact path="/"
-            loggedIn={loggedIn}
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
-            cards={cards}
-            component={Main}
-          />
-          <Footer />
+          <Route path="/cards">
+            <Header loggedIn={loggedIn} onLogout={handleSignOut} />
+            <ProtectedRoute
+              loggedIn={loggedIn}
+              onEditProfile={handleEditProfileClick}
+              onAddPlace={handleAddPlaceClick}
+              onEditAvatar={handleEditAvatarClick}
+              onCardClick={handleCardClick}
+              onCardLike={handleCardLike}
+              onCardDelete={handleCardDelete}
+              cards={cards}
+              component={Main}
+            />
+            <Footer />
+          </Route>
 
           <Route path="/sign-in">
             <Header authLink="sign-up" loggedIn={false} />
@@ -261,8 +294,8 @@ function App() {
             <Register onRegister={handleRegistration} />
           </Route>
 
-          <Route>
-            <Redirect to={`${loggedIn ? "/" : "/signin"}`} />
+          <Route exact path="/">
+            {loggedIn ? <Redirect to="/cards" /> : <Redirect to="/sign-in" />}
           </Route>
         </Switch>
 

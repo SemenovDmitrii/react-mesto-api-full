@@ -1,5 +1,6 @@
+const { JWT_SECRET, NODE_ENV } = process.env;
 const bcrypt = require('bcryptjs');
-const { generateToken } = require('../middlewares/jwt');
+const jwt = require('jsonwebtoken');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
@@ -133,23 +134,10 @@ module.exports.updateAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findOne({ email })
-    .select('+password')
+  User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        throw new UnauthorizedError('Неверный пароль или почта');
-      } else {
-        return bcrypt
-          .compare(password, user.password)
-          .then((isPasswordCorrect) => {
-            if (!isPasswordCorrect) {
-              throw new UnauthorizedError('Неверный пароль или почта');
-            } else {
-              const token = generateToken({ _id: user._id.toString() });
-              res.send({ token });
-            }
-          }).catch(() => next(new UnauthorizedError('Неверный пароль или почта')));
-      }
+      const token = jwt.sign({ _id: user._id }, `${NODE_ENV === 'production' ? JWT_SECRET : 'secret-key'}`, { expiresIn: '7d' });
+      res.send({ token });
     })
     .catch(next);
 };

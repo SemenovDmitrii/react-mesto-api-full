@@ -1,112 +1,87 @@
 export class Api {
-  constructor(config) {
-    this.baseURL = config.baseURL
+  constructor({ baseUrl }) {
+    this._baseUrl = baseUrl;
   }
 
-  _serverResponse(res) {
+  _checkResponse(res) {
     if (res.ok) {
-      return res.json();
+      return res.json()
     }
-    return Promise.reject("Произошла ошибка");
+    else {
+      return Promise.reject(`Ошибка ${res.status}: ${res.statusText}`)
+    }
   }
 
-  getUserInfo(token) {
-    return fetch(`${this.baseURL}/users/me`, {
-      credentials: 'include',
-      method: 'GET',
-      headers: {
-        authorization: `Bearer ${token}`
-      }
-    })
-      .then(this._serverResponse);
-  }
-
-  getInitialCards(token) {
-    return fetch(`${this.baseURL}/cards`, {
-      credentials: 'include',
-      headers: {
-        authorization: `Bearer ${token}`
-      },
-    })
-      .then(this._serverResponse);
-  }
-
-  patchUserInfo({ name, about }, token) {
-    return fetch(`${this.baseURL}/users/me`, {
-      credentials: 'include',
-      method: "PATCH",
-      headers: {
-        authorization: `Bearer ${token}`,
+  get _headers() {
+    return {
+        authorization: `Bearer ${localStorage.getItem('jwt')}`,
         'Content-Type': 'application/json'
-      },
+    }
+}
+
+  getUserInfo() {
+    return fetch(`${this._baseUrl}/users/me`, {
+    headers: this._headers
+    }).then(this._checkResponse);
+  }
+
+  getInitialCards() {
+    return fetch(`${this._baseUrl}/cards`, {
+      headers: this._headers
+    }).then(this._checkResponse);
+  }
+
+  patchUserInfo(name, about) {
+    return fetch(`${this._baseUrl}/users/me`, {
+      method: "PATCH",
+      headers: this._headers,
       body: JSON.stringify({
         name,
         about,
       }),
-    })
-      .then(this._serverResponse);
+    }).then(this._checkResponse);
   }
 
-  postCard({ name, link }, token) {
-    return fetch(`${this.baseURL}/cards`, {
-      credentials: 'include',
+  postCard(name, link) {
+    return fetch(`${this._baseUrl}/cards`, {
       method: "POST",
-      headers: {
-        authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
+      headers: this._headers,
       body: JSON.stringify({
         name,
         link,
       }),
-    }).then(this._serverResponse);
+    }).then(this._checkResponse);
   }
 
-  deleteCard(id, token) {
-    return fetch(`${this.baseURL}/cards/${id}`, {
+  deleteCard(id) {
+    return fetch(`${this._baseUrl}/cards/${id}`, {
       method: "DELETE",
-      credentials: 'include',
-      headers: {
-        authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-    }).then(this._serverResponse);
+      headers: this._headers,
+    }).then(this._checkResponse);
   }
 
-  putLike(id, token) {
+  putLike(id) {
     return fetch(`${this.baseURL}/cards/${id}/likes`, {
       method: "PUT",
-      credentials: 'include',
-      headers: {
-        authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-    }).then(this._serverResponse);
+      eaders: this._headers,
+    }).then(this._checkResponse);
   }
 
-  deleteLike(id, token) {
+  deleteLike(id) {
     return fetch(`${this.baseURL}/cards/${id}/likes`, {
       method: "DELETE",
-      credentials: 'include',
-      headers: {
-        authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-    }).then(this._serverResponse);
+      eaders: this._headers,
+    }).then(this._checkResponse);
   }
 
-  patchAvatar(avatar, token) {
-    return fetch(`${this.baseURL}/users/me/avatar`, {
+  patchAvatar(avatar) {
+    return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
-      credentials: 'include',
-      headers: {
-        authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
+      headers: this._headers,
       body: JSON.stringify({
-        avatar: avatar,
+        avatar,
       }),
-    }).then(this._serverResponse);
+    }).then(this._checkResponse);
   }
 }
 

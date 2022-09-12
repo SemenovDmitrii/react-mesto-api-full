@@ -5,10 +5,9 @@ const Card = require('../models/card');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
-    .then((card) => {
-      res.send({ card });
-    })
-    .catch(next);
+    .populate('owner')
+    .then((cards) => res.send(cards))
+    .catch((err) => next(err));
 };
 
 module.exports.createCard = (req, res, next) => {
