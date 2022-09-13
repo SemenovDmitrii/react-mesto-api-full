@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import * as auth from "../utils/Authorization.js";
 import Header from "./Header";
@@ -18,19 +18,19 @@ import CurrentUserContext from "../contexts/CurrentUserContext.js";
 
 function App() {
   const history = useHistory();
-  const [registerStatus, setRegisterStatus] = React.useState(false);
-  const [loggedIn, setLogged] = React.useState(false);
+  const [registerStatus, setRegisterStatus] = useState(false);
+  const [loggedIn, setLogged] = useState(false);
   const [isInfoTooltipPopupOpen, setIsInfoTooltipPopupOpen] =
-    React.useState(false);
+    useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
-    React.useState(false);
+    useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] =
-    React.useState(false);
-  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
-  const [selectedCard, setSelectedCard] = React.useState({ isOpen: false });
-  const [currentUser, setCurrentUser] = React.useState({});
-  const [cards, setCards] = React.useState([]);
-  const [email, setUserEmail] = React.useState("");
+    useState(false);
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState({ isOpen: false });
+  const [currentUser, setCurrentUser] = useState({});
+  const [cards, setCards] = useState([]);
+  const [email, setUserEmail] = useState("");
   const isOpen =
     isInfoTooltipPopupOpen ||
     isEditAvatarPopupOpen ||
@@ -38,20 +38,53 @@ function App() {
     isAddPlacePopupOpen ||
     selectedCard.isOpen;
 
-  React.useEffect(() => {
-    if (!loggedIn) return;
-    api.getUserInfo().then(setCurrentUser).catch(console.error);
-  }, [loggedIn]);
+  // React.useEffect(() => {
+  //   if (!loggedIn) return;
+  //   api.getUserInfo().then(setCurrentUser).catch(console.error);
+  // }, [loggedIn]);
 
-  React.useEffect(() => {
-    if (!loggedIn) return;
-    api
-      .getInitialCards()
-      .then((res) => {
-        setCards(res?.reverse());
-      })
-      .catch((err) => console.error(err));
-  }, [loggedIn]);
+  // React.useEffect(() => {
+  //   if (!loggedIn) return;
+  //   api
+  //     .getInitialCards()
+  //     .then((res) => {
+  //       setCards(res?.reverse());
+  //     })
+  //     .catch((err) => console.error(err));
+  // }, [loggedIn]);
+
+  // useEffect(() => {
+  //   checkToken();
+  //   if (loggedIn) {
+  //     history.push('/');
+  //   Promise.all([api.getUserInfo(), api.getInitialCards()])
+  //     .then(([userInfo, cards]) => {
+  //       setCurrentUser(userInfo);
+  //       setCards(cards.reverse());
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     })
+  //     }
+  // }, [loggedIn]);
+
+  // const checkToken = () => {
+  //   const token = localStorage.getItem('jwt');
+  //   if(token) {
+  //     setLogged(true);
+  //   auth
+  //     .getToken(token)
+  //     .then((res) => {
+  //       if(res) {
+  //         setUserEmail(res.email)
+  //       };
+  //       history.push('/');
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  //   }
+  // }
 
   // React.useEffect(() => {
   //   const token = localStorage.getItem("jwt");
@@ -165,7 +198,7 @@ function App() {
     setSelectedCard({ isOpen: false });
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     function closeByEscape(evt) {
       if (evt.key === "Escape") {
         closeAllPopups();
@@ -222,65 +255,109 @@ function App() {
       });
   }
 
-  function handleRegistration(email, password) {
-    auth
-      .registration(email, password)
-      .then(() => {
-        setUserEmail(email);
-        setRegisterStatus(true);
-        setIsInfoTooltipPopupOpen(true);
-        history.push("/signin");
-      })
-      .catch((err) => {
-        setRegisterStatus(false);
-        setIsInfoTooltipPopupOpen(true);
-        console.log(`Ошибка регистрации. ${err}`);
-      });
+  function handleRegistration(password, email) {
+    // return auth
+    //   .registration(password, email)
+    //   .then(() => {
+    //     setUserEmail(email);
+    //     setRegisterStatus(true);
+    //     setIsInfoTooltipPopupOpen(true);
+    //     history.push("/sign-in");
+    //   })
+    //   .catch((err) => {
+    //     setRegisterStatus(false);
+    //     setIsInfoTooltipPopupOpen(true);
+    //     console.log(`Ошибка регистрации. ${err}`);
+    //   });
+    auth.registration(password, email)
+            .then(() => {
+                setRegisterStatus(true);
+                setIsInfoTooltipPopupOpen(true);
+                history.push("/sign-in");
+
+            })
+            .catch((err) => {
+              setRegisterStatus(false);
+                  setIsInfoTooltipPopupOpen(true);
+                console.log(err)
+            });
   }
 
-  function handleAuthorize(email, password) {
-    auth
-      .authorize(email, password)
-      .then((res) => {
-        if (res) {
-          localStorage.setItem("jwt", res.token);
-          api.setToken(res.token);
-          setLogged(true);
-          setUserEmail(email);
-          history.push("/");
-        }
-      })
-      .catch((err) => {
-        setRegisterStatus(false);
-        setIsInfoTooltipPopupOpen(true);
-        console.log(`Невозможно войти. ${err}`);
-      });
+  function handleAuthorize(password, email) {
+    // return auth
+    //   .authorize(email, password)
+    //   .then((data) => {
+    //       localStorage.setItem("jwt", data.token);
+    //       setLogged(true);
+    //       setUserEmail(email);
+    //       history.push("/");
+    //   })
+    //   .catch((err) => {
+    //     setRegisterStatus(false);
+    //     setIsInfoTooltipPopupOpen(true);
+    //     console.log(`Невозможно войти. ${err}`);
+    //   });
+    auth.authorize(password, email)
+            .then((data) => {
+                setLogged(true);
+                localStorage.setItem('jwt', data.token);
+                tokenCheck();
+                setUserEmail(email);
+                history.push('/');
+            }).catch((error) => {
+            console.log(error);
+        })
   }
+
+  const tokenCheck = () => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+        auth.getToken(token)
+            .then((res) => {
+                if (res) {
+                    setUserEmail(res.data.email);
+                    setLogged(true);
+                }
+            }).catch(error => console.log(error));
+    }
+}
+
+useEffect(() => {
+  tokenCheck();
+}, []);
+
+useEffect(() => {
+  if (loggedIn) {
+      history.push('/sign-up');
+      return;
+  }
+  history.push('/');
+}, [loggedIn]);
 
   function handleSignOut() {
     localStorage.removeItem("jwt");
     setLogged(false);
-    history.push("/signin");
+    history.push("/sign-in");
   }
 
-  React.useEffect(() => {
-    const handleCheckToken = () => {
-      const jwt = localStorage.getItem("jwt");
-      if (!jwt) {
-        return;
-      }
-      auth
-        .checkToken(jwt)
-        .then((res) => {
-          setUserEmail(res.email);
-          setLogged(true);
-          history.push("/");
-        })
-        .catch((err) => console.log(err));
-    };
+  // useEffect(() => {
+  //   const handleCheckToken = () => {
+  //     const jwt = localStorage.getItem("jwt");
+  //     if (!jwt) {
+  //       return;
+  //     }
+  //     auth
+  //       .checkToken(jwt)
+  //       .then((res) => {
+  //         setUserEmail(res.email);
+  //         setLogged(true);
+  //         history.push("/");
+  //       })
+  //       .catch((err) => console.log(err));
+  //   };
 
-    handleCheckToken();
-  }, [history]);
+  //   handleCheckToken();
+  // }, [history]);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -311,7 +388,7 @@ function App() {
           </Route>
 
           <Route exact path="*">
-            {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
+            {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
           </Route>
         </Switch>
 
