@@ -1,13 +1,21 @@
-import React from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
-function Register(props) {
-  const email = React.useRef();
-  const password = React.useRef();
+function Register({ onRegister }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    props.onRegister(password.current.value, email.current.value);
+  function handleEmailChange(event) {
+    setEmail(event.target.value);
+  }
+
+  function handlePasswordChange(event) {
+    setPassword(event.target.value);
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    onRegister({ email, password });
   }
 
   return (
@@ -25,7 +33,8 @@ function Register(props) {
             placeholder="Email"
             className="auth__input auth__content-email"
             required
-            ref={email}
+            value={email || ""}
+            onChange={handleEmailChange}
           />
           <input
             type="password"
@@ -33,7 +42,8 @@ function Register(props) {
             placeholder="Пароль"
             className="auth__input auth__content-password"
             required
-            ref={password}
+            value={password || ""}
+            onChange={handlePasswordChange}
           />
         </fieldset>
         <button type="submit" className="auth__form-submit">

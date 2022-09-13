@@ -1,44 +1,41 @@
-const { JWT_SECRET, NODE_ENV } = process.env;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
-const UnauthorizedError = require('../errors/UnauthorizedError');
-
-const User = require('../models/user');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((user) => res.send(user))
-    .catch((error) => next(error));
+    .then((users) => {
+      res.send({ users });
+    })
+    .catch(next);
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
-  const { _id } = req.user;
-  User.findById(_id).then((user) => {
-    if (!user) {
-      return next(new NotFoundError('Пользователь не найден.'));
-    }
-    return res.send(user);
-  });
+  User.findById(req.user._id)
+    .then((user) => {
+      res.status(200).send({ data: user });
+    })
+    .catch(next);
 };
 
 module.exports.getUser = (req, res, next) => {
-  const { userId } = req.params;
-  User.findById(userId)
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        return next(new NotFoundError('Пользователь не найден'));
+        next(new NotFoundError('Пользователь с указанным id не найден'));
+        return;
       }
-      return res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('id должен быть валидным'));
-      } else {
-        next(err);
+        next(new BadRequestError('Указаны некорректные данные'));
+        return;
       }
+      next(err);
     });
 };
 
@@ -46,60 +43,59 @@ module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
-      email,
-      password: hash,
-      name,
-      about,
-      avatar,
-    }))
-    .then((user) => res.status(201).send({
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      _id: user._id,
-      email: user.email,
-    }))
-    .catch((err) => {
-      if (err.name === 'MongoServerError' && err.code === 11000) {
-        next(new ConflictError('Пользователь с таким email уже существует'));
-      } else if (err.name === 'ValidationError') {
-        next(new BadRequestError('Ошибка валидации данных'));
-      } else next(err);
-    });
+      name, about, avatar, email, password: hash,
+    })
+      .then((user) => res.send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+      }))
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          next(new BadRequestError('Указаны некорректные данные при попытке создания нового пользователя'));
+          return;
+        }
+        if (err.code === 11000) {
+          next(new ConflictError('Данный email уже занят'));
+          return;
+        }
+        next(err);
+      }));
 };
 
 module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    { name, about },
-    { new: true, runValidators: true },
-  )
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+    .orFail(() => next(new NotFoundError('Пользователь не найден. Не удалось обновить информацию')))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Неверный тип данных.'));
+        next(new BadRequestError('Указаны некорректные данные при обновлении пользователя'));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };
 
 module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    { avatar },
-    { new: true, runValidators: true },
-  )
-    .then((user) => res.status(200).send(user))
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь с указанным id не найден');
+      } else {
+        res.send(user);
+      }
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Неверная ссылка'));
+        next(new BadRequestError('Переданы некорректные данные для обновления аватара'));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };
 
@@ -107,14 +103,8 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key',
-        { expiresIn: '7d' },
-      );
+      const token = jwt.sign({ _id: user._id }, process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.send({ token });
     })
-    .catch(() => {
-      next(new UnauthorizedError('Неверный email или пароль.'));
-    });
+    .catch(next);
 };
