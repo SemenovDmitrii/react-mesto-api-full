@@ -221,7 +221,7 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
         <Switch>
-          <Route path="/cards">
+          <Route path="/">
             <Header loggedIn={loggedIn} onSignOut={handleSignOut} />
             <ProtectedRoute
               loggedIn={loggedIn}
@@ -248,7 +248,7 @@ function App() {
           </Route>
 
           <Route exact path="/">
-            {loggedIn ? <Redirect to="/cards" /> : <Redirect to="/sign-in" />}
+            {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
           </Route>
         </Switch>
 
