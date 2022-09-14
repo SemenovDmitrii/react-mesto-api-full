@@ -47,7 +47,7 @@ export default function Register(props) {
           />
         </fieldset>
         <button type="submit" className="auth__form-submit">
-          Зарегестрироваться
+          Зарегистрироваться
         </button>
       </form>
       <div className="auth__signin-container">
