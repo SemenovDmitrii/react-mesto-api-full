@@ -2,15 +2,15 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 function Register({ onRegister }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setUserEmail] = useState("");
+  const [password, setUserPassword] = useState("");
 
   function handleEmailChange(event) {
-    setEmail(event.target.value);
+    setUserEmail(event.target.value);
   }
 
   function handlePasswordChange(event) {
-    setPassword(event.target.value);
+    setUserPassword(event.target.value);
   }
 
   function handleSubmit(event) {

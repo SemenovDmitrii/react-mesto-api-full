@@ -19,7 +19,7 @@ _checkResponse(res) {
 }
 
   getUserInfo() {
-    return fetch(`${this._url}/users/me`, {
+    return fetch(`${this._baseUrl}/users/me`, {
       method: 'GET',
       headers: {
         authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -29,7 +29,7 @@ _checkResponse(res) {
   }
 
   getInitialCards() {
-    return fetch(`${this._url}/cards`, {
+    return fetch(`${this._baseUrl}/cards`, {
       method: 'GET',
       headers: {
         authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -39,7 +39,7 @@ _checkResponse(res) {
   }
 
   patchUserInfo(name, about) {
-    return fetch(`${this._url}/users/me`, {
+    return fetch(`${this._baseUrl}/users/me`, {
       method: "PATCH",
       headers: {
         authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -53,7 +53,7 @@ _checkResponse(res) {
   }
 
   postCard(name, link) {
-    return fetch(`${this._url}/cards`, {
+    return fetch(`${this._baseUrl}/cards`, {
       method: 'POST',
       headers: {
         authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -67,7 +67,7 @@ _checkResponse(res) {
   }
 
   deleteCard(cardId) {
-    return fetch(`${this._url}/cards/${cardId}`, {
+    return fetch(`${this._baseUrl}/cards/${cardId}`, {
       method: "DELETE",
       headers: {
         authorization: `Bearer ${localStorage.getItem("jwt")}`,
@@ -76,19 +76,66 @@ _checkResponse(res) {
     }).then((res) => this._checkResponse(res));
   }
 
-  changeLikeCardStatus(cardId, isLiked) {
-    return fetch(`${this._url}/cards/likes/${cardId}`, {
-      method: `${isLiked ? 'PUT' : 'DELETE'}`,
-      headers: {
-        authorization: `Bearer ${localStorage.getItem("jwt")}`,
-        "Content-Type": "application/json",
-      },
-    }).then(this._checkResponse);
+  // changeLikeCardStatus(cardId, isLiked) {
+  //   return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+  //     method: `${isLiked ? 'PUT' : 'DELETE'}`,
+  //     headers: {
+  //       authorization: `Bearer ${localStorage.getItem("jwt")}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //   }).then((res) => this._checkResponse(res));
+  // }
 
-  }
+  changeLikeCardStatus(cardId, isLiked) {
+    if (!isLiked) {
+        return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+            method: 'PUT',
+            headers: {
+                    authorization: `Bearer ${localStorage.getItem("jwt")}`,
+                    "Content-Type": "application/json",
+                  },
+        }).then((res) => this._checkResponse(res));
+    } else {
+        return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+            method: 'DELETE',
+            headers: {
+              authorization: `Bearer ${localStorage.getItem("jwt")}`,
+              "Content-Type": "application/json",
+            },
+        }).then((res) => this._checkResponse(res));
+    }
+}
+
+  // changeLikeCardStatus(cardId, isLiked) {
+  //   if (isLiked) {
+  //       return this.putLike(cardId);
+  //   } else {
+  //       return this.deleteLike(cardId);
+  //   }
+  // }
+
+  // putLike(cardId) {
+  //   return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+  //     method: "PUT",
+  //     headers: {
+  //       authorization: `Bearer ${localStorage.getItem("jwt")}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //   }).then((res) => this._checkResponse(res));
+  // }
+
+  // deleteLike(cardId) {
+  //   return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+  //     method: "DELETE",
+  //     headers: {
+  //       authorization: `Bearer ${localStorage.getItem("jwt")}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //   }).then((res) => this._checkResponse(res));
+  // }
 
   patchAvatar(avatar) {
-    return fetch(`${this._url}/users/me/avatar`, {
+    return fetch(`${this._baseUrl}/users/me/avatar`, {
       method: "PATCH",
       headers: {
         authorization: `Bearer ${localStorage.getItem("jwt")}`,

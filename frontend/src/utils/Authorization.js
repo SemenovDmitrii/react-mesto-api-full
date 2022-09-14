@@ -1,6 +1,6 @@
 export const BASE_URL = 'https://api.sdv.nomoredomains.sbs';
 
-function checkResponse(res) {
+const checkResponse = (res) => {
     if (res.ok) {
       return res.json();
     }

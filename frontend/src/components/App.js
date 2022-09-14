@@ -37,14 +37,32 @@ function App() {
 
   useEffect(() => {
     Promise.all([api.getUserInfo(), api.getInitialCards([])])
-      .then(([data, cards]) => {
-        setCurrentUser(data.data);
+      .then(([userInfo, cards]) => {
+        setCurrentUser(userInfo);
         setCards(cards.card.reverse());
+        history.push('/');
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [loggedIn]);
+  }, [history, loggedIn]);
+  // useEffect(() => {
+  //   api.getUserInfo()
+  //   .then((userInfo) => {
+  //     setCurrentUser(userInfo);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
+  //   api
+  //     .getInitialCards()
+  //     .then((cards) => {
+  //       setCards(cards.card.reverse());
+  //     })
+  //     .catch((err) => {
+  //       console.log(`Ошибка : ${err}`);
+  //     });
+  // },[history, loggedIn])
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i === currentUser._id);
@@ -141,7 +159,7 @@ function App() {
 
   function handleAddPlaceSubmit({ name, link }) {
     api
-      .addCard(name, link)
+      .postCard(name, link)
       .then((newCard) => {
         setCards([newCard.card, ...cards]);
         closeAllPopups();
@@ -152,13 +170,13 @@ function App() {
   }
 
   useEffect(() => {
-    const token = localStorage.getItem("jwt");
-    if (token) {
+    const userToken = localStorage.getItem("jwt");
+    if (userToken) {
       auth
-        .getToken(token)
+        .getToken(userToken)
         .then((data) => {
           setLogged(true);
-          setUserEmail(data.data.email);
+          setUserEmail(data.email);
           history.push("/");
         })
         .catch((err) => {
@@ -186,8 +204,7 @@ function App() {
   }
 
   function handleAuthorize({ email, password }) {
-    auth
-      .authorize({ email, password })
+    auth.authorize({ email, password })
       .then((res) => {
         localStorage.setItem("jwt", res.token);
         setLogged(true);
@@ -225,7 +242,7 @@ function App() {
             component={Main}
           />
           <Route path="/sign-in">
-            <Login onAuthorize={handleAuthorize} />
+            <Login onLogin={handleAuthorize} />
           </Route>
           <Route path="/sign-up">
             <Register onRegister={handleRegistration} />
