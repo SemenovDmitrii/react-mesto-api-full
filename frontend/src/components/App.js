@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Route, Switch, useHistory } from "react-router-dom";
+import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import * as auth from "../utils/Authorization.js";
 import Header from "./Header";
 import Main from "./Main";
@@ -51,27 +51,18 @@ function App() {
   }, [history, loggedIn]);
 
   function handleCardLike(card) {
-  //   const isLiked = card.likes.some((i) => i._id === currentUser._id);
-  //   api
-  //     .changeLikeCardStatus(card._id, isLiked)
-  //     .then((newCard) => {
-  //       setCards((state) =>
-  //         state.map((c) => (c._id === card._id ? newCard.card : c))
-  //       );
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }
-  const isLiked = card.likes.some(i => i === currentUser._id)
-  api.changeLikeCardStatus(card._id, !isLiked)
-    .then((newCard) => {
-      setCards((state) => state.map((c) => c._id === card._id ? newCard.card : c))
-
-    }).catch((err) => {
-      console.log(err);
-    });
-}
+    const isLiked = card.likes.some((i) => i === currentUser._id);
+    api
+      .changeLikeCardStatus(card._id, !isLiked)
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((c) => (c._id === card._id ? newCard.card : c))
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   function handleCardDelete(card) {
     api
@@ -229,30 +220,37 @@ function App() {
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
-        <Header email={email} onSignOut={handleSignOut} />
         <Switch>
-          <ProtectedRoute
-            exact
-            path="/"
-            loggedIn={loggedIn}
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            onCardDelete={handleCardDeleteClick}
-            cards={cards}
-            component={Main}
-          />
-          <Route path="/sign-in">
-            <Login onLogin={handleAuthorize} />
+          <Route path="/cards">
+            <Header loggedIn={loggedIn} onSignOut={handleSignOut} />
+            <ProtectedRoute
+              loggedIn={loggedIn}
+              onEditProfile={handleEditProfileClick}
+              onAddPlace={handleAddPlaceClick}
+              onEditAvatar={handleEditAvatarClick}
+              onCardClick={handleCardClick}
+              onCardLike={handleCardLike}
+              onCardDelete={handleCardDeleteClick}
+              cards={cards}
+              component={Main}
+            />
+            <Footer />
           </Route>
+
+          <Route path="/sign-in">
+            <Header authLink="sign-up" loggedIn={false} />
+            <Login onAuthorize={handleAuthorize} />
+          </Route>
+
           <Route path="/sign-up">
+            <Header authLink="sign-in" loggedIn={false} />
             <Register onRegister={handleRegistration} />
           </Route>
-        </Switch>
 
-        <Footer />
+          <Route exact path="/">
+            {loggedIn ? <Redirect to="/cards" /> : <Redirect to="/sign-in" />}
+          </Route>
+        </Switch>
 
         <InfoTooltip
           isOpen={isInfoTooltipPopupOpen}
@@ -280,7 +278,6 @@ function App() {
           onConfirm={handleCardDelete}
           card={removedCard}
         />
-        {/* <PopupWithForm name="confirm" title="Вы уверены?" buttonText="Да" /> */}
         <ImagePopup card={selectedCard} onClose={closeAllPopups} />
       </div>
     </CurrentUserContext.Provider>

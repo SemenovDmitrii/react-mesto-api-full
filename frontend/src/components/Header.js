@@ -16,7 +16,7 @@ function Header(props) {
         {props.loggedIn ? (
           <>
             <p className="header__user-email">{currentUser.email}</p>
-            <button className="header__user-exit" onClick={props.onLogout}>
+            <button className="header__user-exit" onClick={props.onSignOut}>
               Выйти
             </button>
           </>

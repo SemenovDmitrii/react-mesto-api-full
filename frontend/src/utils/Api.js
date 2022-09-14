@@ -76,27 +76,37 @@ _checkResponse(res) {
     }).then((res) => this._checkResponse(res));
   }
 
+  // changeLikeCardStatus(cardId, isLiked) {
+  //   if (isLiked) {
+  //       return this.putLike(cardId);
+  //   } else {
+  //       return this.deleteLike(cardId);
+  //   }
+  // }
+
+  // putLike(cardId) {
+  //   return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+  //     method: "PUT",
+  //     headers: {
+  //       authorization: `Bearer ${localStorage.getItem("jwt")}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //   }).then((res) => this._checkResponse(res));
+  // }
+
+  // deleteLike(cardId) {
+  //   return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+  //     method: "DELETE",
+  //     headers: {
+  //       authorization: `Bearer ${localStorage.getItem("jwt")}`,
+  //       "Content-Type": "application/json",
+  //     },
+  //   }).then((res) => this._checkResponse(res));
+  // }
+  
   changeLikeCardStatus(cardId, isLiked) {
-    if (isLiked) {
-        return this.putLike(cardId);
-    } else {
-        return this.deleteLike(cardId);
-    }
-  }
-
-  putLike(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
-      method: "PUT",
-      headers: {
-        authorization: `Bearer ${localStorage.getItem("jwt")}`,
-        "Content-Type": "application/json",
-      },
-    }).then((res) => this._checkResponse(res));
-  }
-
-  deleteLike(cardId) {
-    return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
-      method: "DELETE",
+      method: `${isLiked ? 'PUT' : 'DELETE'}`,
       headers: {
         authorization: `Bearer ${localStorage.getItem("jwt")}`,
         "Content-Type": "application/json",
