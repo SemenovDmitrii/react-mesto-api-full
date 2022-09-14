@@ -4,28 +4,30 @@ import * as auth from "../utils/Authorization.js";
 import Header from "./Header";
 import Main from "./Main";
 import Footer from "./Footer";
-import PopupWithForm from "./PopupWithForm";
 import EditAvatarPopup from "./EditAvatarPopup";
 import EditProfilePopup from "./EditProfilePopup";
 import AddPlacePopup from "./AddPlacePopup";
+import ConfirmPopup from "./ConfirmPopup.js";
 import ImagePopup from "./ImagePopup";
 import InfoTooltip from "./InfoTooltip";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "./Login";
 import Register from "./Register";
 import api from "../utils/Api.js";
-import CurrentUserContext from "../contexts/CurrentUserContext.js";
+import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 
 function App() {
   const history = useHistory();
   const [registerStatus, setRegisterStatus] = useState(false);
   const [loggedIn, setLogged] = useState(false);
   const [isInfoTooltipPopupOpen, setIsInfoTooltipPopupOpen] = useState(false);
+  const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState({ isOpen: false });
   const [currentUser, setCurrentUser] = useState({});
+  const [removedCard, setRemovedCard] = useState({});
   const [cards, setCards] = useState([]);
   const [email, setUserEmail] = useState("");
   const isOpen =
@@ -33,50 +35,43 @@ function App() {
     isEditAvatarPopupOpen ||
     isEditProfilePopupOpen ||
     isAddPlacePopupOpen ||
+    isConfirmPopupOpen ||
     selectedCard.isOpen;
 
   useEffect(() => {
     Promise.all([api.getUserInfo(), api.getInitialCards([])])
       .then(([userInfo, cards]) => {
-        setCurrentUser(userInfo);
+        setCurrentUser(userInfo.data);
         setCards(cards.card.reverse());
-        history.push('/');
+        history.push("/");
       })
       .catch((err) => {
         console.log(err);
       });
   }, [history, loggedIn]);
-  // useEffect(() => {
-  //   api.getUserInfo()
-  //   .then((userInfo) => {
-  //     setCurrentUser(userInfo);
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
-  //   api
-  //     .getInitialCards()
-  //     .then((cards) => {
-  //       setCards(cards.card.reverse());
-  //     })
-  //     .catch((err) => {
-  //       console.log(`Ошибка : ${err}`);
-  //     });
-  // },[history, loggedIn])
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some((i) => i === currentUser._id);
-    api
-      .changeLikeCardStatus(card._id, !isLiked)
-      .then((newCard) => {
-        setCards((state) =>
-          state.map((c) => (c._id === card._id ? newCard.card : c))
-        );
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
+  //   const isLiked = card.likes.some((i) => i._id === currentUser._id);
+  //   api
+  //     .changeLikeCardStatus(card._id, isLiked)
+  //     .then((newCard) => {
+  //       setCards((state) =>
+  //         state.map((c) => (c._id === card._id ? newCard.card : c))
+  //       );
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }
+  const isLiked = card.likes.some(i => i === currentUser._id)
+  api.changeLikeCardStatus(card._id, !isLiked)
+    .then((newCard) => {
+      setCards((state) => state.map((c) => c._id === card._id ? newCard.card : c))
+
+    }).catch((err) => {
+      console.log(err);
+    });
+}
 
   function handleCardDelete(card) {
     api
@@ -87,6 +82,7 @@ function App() {
             return c._id !== card._id;
           })
         );
+        closeAllPopups();
       })
       .catch((err) => {
         console.log(`Ошибка : ${err}`);
@@ -106,6 +102,10 @@ function App() {
     card.isOpen = true;
     setSelectedCard(card);
   }
+  function handleCardDeleteClick(card) {
+    setIsConfirmPopupOpen(true);
+    setRemovedCard(card);
+  }
 
   function closeAllPopups() {
     setIsInfoTooltipPopupOpen(false);
@@ -113,6 +113,7 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setSelectedCard({ isOpen: false });
+    setIsConfirmPopupOpen(false);
   }
 
   useEffect(() => {
@@ -204,7 +205,8 @@ function App() {
   }
 
   function handleAuthorize({ email, password }) {
-    auth.authorize({ email, password })
+    auth
+      .authorize({ email, password })
       .then((res) => {
         localStorage.setItem("jwt", res.token);
         setLogged(true);
@@ -230,14 +232,15 @@ function App() {
         <Header email={email} onSignOut={handleSignOut} />
         <Switch>
           <ProtectedRoute
-            exact path="/"
+            exact
+            path="/"
             loggedIn={loggedIn}
             onEditProfile={handleEditProfileClick}
             onAddPlace={handleAddPlaceClick}
             onEditAvatar={handleEditAvatarClick}
             onCardClick={handleCardClick}
             onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
+            onCardDelete={handleCardDeleteClick}
             cards={cards}
             component={Main}
           />
@@ -271,7 +274,13 @@ function App() {
           onClose={closeAllPopups}
           onAddPlace={handleAddPlaceSubmit}
         />
-        <PopupWithForm name="confirm" title="Вы уверены?" buttonText="Да" />
+        <ConfirmPopup
+          isOpen={isConfirmPopupOpen}
+          onClose={closeAllPopups}
+          onConfirm={handleCardDelete}
+          card={removedCard}
+        />
+        {/* <PopupWithForm name="confirm" title="Вы уверены?" buttonText="Да" /> */}
         <ImagePopup card={selectedCard} onClose={closeAllPopups} />
       </div>
     </CurrentUserContext.Provider>

@@ -1,21 +1,21 @@
-import { useState } from "react";
+import React from 'react';
 
-function Login({ onLogin }) {
-  const [email, setUserEmail] = useState("");
-  const [password, setUserPassword] = useState("");
+export default function Login(props) {
+    const [ email, setEmail ] = React.useState('');
+    const [ password, setPassword ] = React.useState('');
 
-  function handleEmailChange(event) {
-    setUserEmail(event.target.value);
-  }
+    function handleChangeEmail(evt) {
+        setEmail(evt.target.value);
+    }
 
-  function handlePasswordChange(event) {
-    setUserPassword(event.target.value);
-  }
+    function handleChangePassword(evt) {
+        setPassword(evt.target.value);
+    }
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    onLogin({ email, password });
-  }
+    function handleSubmit(evt) {
+        evt.preventDefault();
+        props.onLogin({ email, password });
+    }
 
   return (
     <section className="auth">
@@ -33,7 +33,7 @@ function Login({ onLogin }) {
             className="auth__input auth__content-email"
             required
             value={email || ""}
-            onChange={handleEmailChange}
+            onChange={handleChangeEmail}
           />
           <input
             type="password"
@@ -42,7 +42,7 @@ function Login({ onLogin }) {
             className="auth__input auth__content-password"
             required
             value={password || ""}
-            onChange={handlePasswordChange}
+            onChange={handleChangePassword}
           />
         </fieldset>
         <button type="submit" className="auth__form-submit">
@@ -52,5 +52,3 @@ function Login({ onLogin }) {
     </section>
   );
 }
-
-export default Login;
