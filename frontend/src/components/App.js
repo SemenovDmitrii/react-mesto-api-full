@@ -39,6 +39,7 @@ function App() {
     selectedCard.isOpen;
 
   useEffect(() => {
+    if (!loggedIn) return
     Promise.all([api.getUserInfo(), api.getInitialCards([])])
       .then(([userInfo, cards]) => {
         setCurrentUser(userInfo.data);
@@ -221,7 +222,7 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
         <Switch>
-          <Route path="/">
+          <Route path="/place">
             <Header loggedIn={loggedIn} onSignOut={handleSignOut} />
             <ProtectedRoute
               loggedIn={loggedIn}
@@ -248,7 +249,7 @@ function App() {
           </Route>
 
           <Route exact path="/">
-            {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+            {loggedIn ? <Redirect to="/place" /> : <Redirect to="/sign-in" />}
           </Route>
         </Switch>
 
